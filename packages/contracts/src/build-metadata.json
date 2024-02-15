@@ -1,21 +1,20 @@
 {
   "ui": {},
-  "change": "Initial build.",
+  "change": "This is the first build of the first release.",
   "pluginSetup": {
     "prepareInstallation": {
-      "description": "The information required for the installation of build 1.",
+      "description": "The information required for the installation.",
       "inputs": [
         {
-          "name": "number",
-          "type": "uint256",
-          "internalType": "uint256",
-          "description": "The initial number to be stored."
+          "internalType": "address",
+          "name": "admin",
+          "type": "address",
+          "description": "The address of the admin account receiving the `EXECUTE_PERMISSION_ID` permission."
         }
       ]
     },
-    "prepareUpdate": {},
     "prepareUninstallation": {
-      "description": "The information required for the uninstallation of build 1.",
+      "description": "No input is required for the uninstallation.",
       "inputs": []
     }
   }
