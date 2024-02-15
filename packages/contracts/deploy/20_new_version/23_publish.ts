@@ -7,13 +7,20 @@ import {
 import {
   findPluginRepo,
   getPastVersionCreatedEvents,
+  getProductionNetworkName,
   pluginEnsDomain,
 } from '../../utils/helpers';
 import {
+  getLatestNetworkDeployment,
+  getNetworkNameByAlias,
+} from '@aragon/osx-commons-configs';
+import {
   PLUGIN_REPO_PERMISSIONS,
+  UnsupportedNetworkError,
   toHex,
   uploadToIPFS,
 } from '@aragon/osx-commons-sdk';
+import {ethers} from 'hardhat';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import path from 'path';
@@ -78,20 +85,45 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   // Create Version
+
+  // TODO impersonate the managing DAO, adapt the script for local test deployments vs. production deployments
+  const productionNetworkName = getProductionNetworkName(hre);
+  const network = getNetworkNameByAlias(productionNetworkName);
+  if (network === null) {
+    throw new UnsupportedNetworkError(productionNetworkName);
+  }
+  const networkDeployments = getLatestNetworkDeployment(network);
+  if (networkDeployments === null) {
+    throw `Deployments are not available on network ${network}.`;
+  }
+
+  await hre.network.provider.request({
+    method: 'hardhat_impersonateAccount',
+    params: [networkDeployments.ManagementDAOProxy.address],
+  });
+
+  const managementDao = await ethers.getSigner(
+    networkDeployments.ManagementDAOProxy.address
+  );
+
   if (
-    await pluginRepo.callStatic.isGranted(
-      pluginRepo.address,
-      deployer.address,
-      PLUGIN_REPO_PERMISSIONS.MAINTAINER_PERMISSION_ID,
-      []
-    )
+    await pluginRepo
+      .connect(managementDao)
+      .callStatic.isGranted(
+        pluginRepo.address,
+        managementDao.address,
+        PLUGIN_REPO_PERMISSIONS.MAINTAINER_PERMISSION_ID,
+        []
+      )
   ) {
-    const tx = await pluginRepo.createVersion(
-      VERSION.release,
-      setup.address,
-      toHex(buildMetadataURI),
-      toHex(releaseMetadataURI)
-    );
+    const tx = await pluginRepo
+      .connect(managementDao)
+      .createVersion(
+        VERSION.release,
+        setup.address,
+        toHex(buildMetadataURI),
+        toHex(releaseMetadataURI)
+      );
 
     if (setup == undefined || setup?.receipt == undefined) {
       throw Error('setup deployment unavailable');
