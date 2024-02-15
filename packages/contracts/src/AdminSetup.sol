@@ -2,35 +2,32 @@
 
 pragma solidity ^0.8.8;
 
-import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
-
 import {IPluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/IPluginSetup.sol";
 import {PluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/PluginSetup.sol";
+import {PermissionLib} from "@aragon/osx-commons-contracts/src/permission/PermissionLib.sol";
+import {ProxyLib} from "@aragon/osx-commons-contracts/src/utils/deployment/ProxyLib.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
 
-import {DAO} from "../../../core/dao/DAO.sol";
-import {PermissionLib} from "@aragon/osx-commons-contracts/src/permission/PermissionLib.sol";
 import {Admin} from "./Admin.sol";
 
 /// @title AdminAddressSetup
 /// @author Aragon Association - 2022-2023
 /// @notice The setup contract of the `Admin` plugin.
-/// @dev v1.1 (Release 1, Build 1)
+/// @dev v1.1 (Release 1, Build 2)
 /// @custom:security-contact sirt@aragon.org
 contract AdminSetup is PluginSetup {
-    using Clones for address;
+    using ProxyLib for address;
 
-    /// @notice The address of the `Admin` plugin logic contract to be cloned.
-    address private immutable implementation_;
+    // TODO This permission identifier has to be moved inside `PermissionLib` as per task OS-954.
+    /// @notice The ID of the permission required to call the `execute` function.
+    bytes32 internal constant EXECUTE_PERMISSION_ID = keccak256("EXECUTE_PERMISSION");
 
     /// @notice Thrown if the admin address is zero.
     /// @param admin The admin address.
     error AdminAddressInvalid(address admin);
 
     /// @notice The constructor setting the `Admin` implementation contract to clone from.
-    constructor() {
-        implementation_ = address(new Admin());
-    }
+    constructor() PluginSetup(address(new Admin())) {}
 
     /// @inheritdoc IPluginSetup
     function prepareInstallation(
@@ -44,11 +41,9 @@ contract AdminSetup is PluginSetup {
             revert AdminAddressInvalid({admin: admin});
         }
 
-        // Clone plugin contract.
-        plugin = implementation_.clone();
-
-        // Initialize cloned plugin contract.
-        Admin(plugin).initialize(IDAO(_dao));
+        // Clone and initialize the plugin contract.
+        bytes memory initData = abi.encodeCall(Admin.initialize, (IDAO(_dao)));
+        plugin = IMPLEMENTATION.deployMinimalProxy(initData);
 
         // Prepare permissions
         PermissionLib.MultiTargetPermission[]
@@ -69,7 +64,7 @@ contract AdminSetup is PluginSetup {
             where: _dao,
             who: plugin,
             condition: PermissionLib.NO_CONDITION,
-            permissionId: DAO(payable(_dao)).EXECUTE_PERMISSION_ID()
+            permissionId: EXECUTE_PERMISSION_ID
         });
 
         preparedSetupData.permissions = permissions;
@@ -80,7 +75,7 @@ contract AdminSetup is PluginSetup {
     function prepareUninstallation(
         address _dao,
         SetupPayload calldata _payload
-    ) external view returns (PermissionLib.MultiTargetPermission[] memory permissions) {
+    ) external pure returns (PermissionLib.MultiTargetPermission[] memory permissions) {
         // Prepare permissions
         permissions = new PermissionLib.MultiTargetPermission[](1);
 
@@ -89,12 +84,7 @@ contract AdminSetup is PluginSetup {
             where: _dao,
             who: _payload.plugin,
             condition: PermissionLib.NO_CONDITION,
-            permissionId: DAO(payable(_dao)).EXECUTE_PERMISSION_ID()
+            permissionId: EXECUTE_PERMISSION_ID
         });
-    }
-
-    /// @inheritdoc IPluginSetup
-    function implementation() external view returns (address) {
-        return implementation_;
     }
 }
