@@ -1,17 +1,18 @@
-import {DAOMock, IPlugin} from '../../typechain';
+import {IPlugin} from '../../typechain';
 import {hashHelpers} from '../../utils/helpers';
 import {findEvent} from '@aragon/osx-commons-sdk';
 import {
   PluginSetupProcessorEvents,
   PluginSetupProcessorStructs,
   PluginSetupProcessor,
+  DAO,
 } from '@aragon/osx-ethers';
 import {expect} from 'chai';
 import {ContractTransaction} from 'ethers';
 
 export async function installPLugin(
   psp: PluginSetupProcessor,
-  dao: DAOMock,
+  dao: DAO,
   pluginSetupRef: PluginSetupProcessorStructs.PluginSetupRefStruct,
   data: string
 ): Promise<{
@@ -51,7 +52,7 @@ export async function installPLugin(
 
 export async function uninstallPLugin(
   psp: PluginSetupProcessor,
-  dao: DAOMock,
+  dao: DAO,
   plugin: IPlugin,
   pluginSetupRef: PluginSetupProcessorStructs.PluginSetupRefStruct,
   data: string,
@@ -96,7 +97,7 @@ export async function uninstallPLugin(
 
 export async function updatePlugin(
   psp: PluginSetupProcessor,
-  dao: DAOMock,
+  dao: DAO,
   plugin: IPlugin,
   currentHelpers: string[],
   pluginSetupRefCurrent: PluginSetupProcessorStructs.PluginSetupRefStruct,
