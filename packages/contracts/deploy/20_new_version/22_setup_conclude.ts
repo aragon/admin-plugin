@@ -37,7 +37,3 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 export default func;
 func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'NewVersion', 'Verification'];
-
-func.skip = async () => {
-  return true;
-}; // TODO skip if the setupDeployment cannot be found

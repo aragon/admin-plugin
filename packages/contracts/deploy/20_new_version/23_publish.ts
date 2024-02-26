@@ -1,5 +1,6 @@
 import {
   METADATA,
+  PLUGIN_CONTRACT_NAME,
   PLUGIN_REPO_ENS_SUBDOMAIN_NAME,
   PLUGIN_SETUP_CONTRACT_NAME,
   VERSION,
@@ -7,20 +8,16 @@ import {
 import {
   findPluginRepo,
   getPastVersionCreatedEvents,
-  getProductionNetworkName,
+  impersonatedManagementDaoSigner,
+  isLocal,
   pluginEnsDomain,
 } from '../../utils/helpers';
 import {
-  getLatestNetworkDeployment,
-  getNetworkNameByAlias,
-} from '@aragon/osx-commons-configs';
-import {
   PLUGIN_REPO_PERMISSIONS,
-  UnsupportedNetworkError,
   toHex,
   uploadToIPFS,
 } from '@aragon/osx-commons-sdk';
-import {ethers} from 'hardhat';
+import {writeFile} from 'fs/promises';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import path from 'path';
@@ -84,50 +81,40 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     );
   }
 
-  // Create Version
-
-  // TODO impersonate the managing DAO, adapt the script for local test deployments vs. production deployments
-  const productionNetworkName = getProductionNetworkName(hre);
-  const network = getNetworkNameByAlias(productionNetworkName);
-  if (network === null) {
-    throw new UnsupportedNetworkError(productionNetworkName);
-  }
-  const networkDeployments = getLatestNetworkDeployment(network);
-  if (networkDeployments === null) {
-    throw `Deployments are not available on network ${network}.`;
+  if (setup == undefined || setup?.receipt == undefined) {
+    throw Error('setup deployment unavailable');
   }
 
-  await hre.network.provider.request({
-    method: 'hardhat_impersonateAccount',
-    params: [networkDeployments.ManagementDAOProxy.address],
-  });
-
-  const managementDao = await ethers.getSigner(
-    networkDeployments.ManagementDAOProxy.address
+  const isDeployerMaintainer = await pluginRepo.isGranted(
+    pluginRepo.address,
+    deployer.address,
+    PLUGIN_REPO_PERMISSIONS.MAINTAINER_PERMISSION_ID,
+    []
   );
 
+  // If this is a local depoloyment and the deployer doesn't have `MAINTAINER_PERMISSION_ID`  permission
+  // we impersonate the management DAO for integration testing purposes.
+  const signer =
+    isDeployerMaintainer || !isLocal(hre)
+      ? deployer
+      : await impersonatedManagementDaoSigner(hre);
+
   if (
-    await pluginRepo
-      .connect(managementDao)
-      .callStatic.isGranted(
-        pluginRepo.address,
-        managementDao.address,
-        PLUGIN_REPO_PERMISSIONS.MAINTAINER_PERMISSION_ID,
-        []
-      )
+    await pluginRepo.isGranted(
+      pluginRepo.address,
+      signer.address,
+      PLUGIN_REPO_PERMISSIONS.MAINTAINER_PERMISSION_ID,
+      []
+    )
   ) {
     const tx = await pluginRepo
-      .connect(managementDao)
+      .connect(signer)
       .createVersion(
         VERSION.release,
         setup.address,
         toHex(buildMetadataURI),
         toHex(releaseMetadataURI)
       );
-
-    if (setup == undefined || setup?.receipt == undefined) {
-      throw Error('setup deployment unavailable');
-    }
 
     await tx.wait();
 
@@ -142,9 +129,31 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       `Published ${PLUGIN_SETUP_CONTRACT_NAME} at ${setup.address} in PluginRepo ${PLUGIN_REPO_ENS_SUBDOMAIN_NAME} at ${pluginRepo.address}.`
     );
   } else {
-    throw Error(
-      `The new version cannot be published because the deployer ('${deployer.address}') is lacking the ${PLUGIN_REPO_PERMISSIONS.MAINTAINER_PERMISSION_ID} permission on repo (${pluginRepo.address}).`
-    );
+    // The deployer is not a repo maintainer and we are not deploying to a production network,
+    // so we write the data into a file for a management DAO member to create a proposal from it.
+    const data = {
+      proposalTitle: `Publish '${PLUGIN_CONTRACT_NAME}' plugin v${VERSION.release}.${VERSION.build}`,
+      proposalSummary: `Publishes v${VERSION.release}.${VERSION.build} of the '${PLUGIN_CONTRACT_NAME}' plugin in the '${ensDomain}' plugin repo.`,
+      proposalDescription: `Publishes the '${PLUGIN_SETUP_CONTRACT_NAME}' deployed at '${setup.address}' 
+      as v${VERSION.release}.${VERSION.build} in the '${ensDomain}' plugin repo at '${pluginRepo.address}', 
+      with release metadata '${releaseMetadataURI}' and (immutable) build metadata '${buildMetadataURI}'.`,
+      actions: [
+        {
+          to: pluginRepo.address,
+          createVersion: {
+            _release: VERSION.release,
+            _pluginSetup: setup.address,
+            _buildMetadata: toHex(buildMetadataURI),
+            _releaseMetadata: toHex(releaseMetadataURI),
+          },
+        },
+      ],
+    };
+    // TODO Create one txn data object to directly create it from metamask.
+
+    const path = `./createVersionProposalData-${hre.network.name}.json`;
+    await writeFile(path, JSON.stringify(data, null, 2));
+    console.log(`Saved data to '${path}'`);
   }
 };
 

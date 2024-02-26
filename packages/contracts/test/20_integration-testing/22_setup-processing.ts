@@ -1,5 +1,5 @@
 import {createDaoProxy} from '../10_unit-testing/11_plugin';
-import {METADATA} from '../../plugin-settings';
+import {METADATA, VERSION} from '../../plugin-settings';
 import {AdminSetup, AdminSetup__factory, Admin__factory} from '../../typechain';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
 import {installPLugin, uninstallPLugin} from './test-helpers';
@@ -7,7 +7,11 @@ import {
   getLatestNetworkDeployment,
   getNetworkNameByAlias,
 } from '@aragon/osx-commons-configs';
-import {getNamedTypesFromMetadata} from '@aragon/osx-commons-sdk';
+import {
+  DAO_PERMISSIONS,
+  PLUGIN_SETUP_PROCESSOR_PERMISSIONS,
+  getNamedTypesFromMetadata,
+} from '@aragon/osx-commons-sdk';
 import {
   PluginSetupProcessor,
   PluginRepo,
@@ -18,56 +22,72 @@ import {
 import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
-import {BigNumber} from 'ethers';
 import env, {deployments, ethers} from 'hardhat';
 
 const productionNetworkName = getProductionNetworkName(env);
 
 describe(`PluginSetup processing on network '${productionNetworkName}'`, function () {
-  context('Build 1', async () => {
-    it('installs & uninstalls', async () => {
-      const {alice, deployer, psp, dao, pluginSetupRef} = await loadFixture(
-        fixture
+  it('installs & uninstalls the current build', async () => {
+    const {alice, deployer, psp, dao, pluginSetupRef} = await loadFixture(
+      fixture
+    );
+
+    // Grant deployer all required permissions
+    await dao
+      .connect(deployer)
+      .grant(
+        psp.address,
+        deployer.address,
+        PLUGIN_SETUP_PROCESSOR_PERMISSIONS.APPLY_INSTALLATION_PERMISSION_ID
       );
-
-      // Allow all authorized calls to happen
-
-      // Install build 1.
-      const results = await installPLugin(
-        psp,
-        dao,
-        pluginSetupRef,
-        ethers.utils.defaultAbiCoder.encode(
-          getNamedTypesFromMetadata(
-            METADATA.build.pluginSetup.prepareInstallation.inputs
-          ),
-          [alice.address]
-        )
+    await dao
+      .connect(deployer)
+      .grant(
+        psp.address,
+        deployer.address,
+        PLUGIN_SETUP_PROCESSOR_PERMISSIONS.APPLY_UNINSTALLATION_PERMISSION_ID
       );
+    await dao
+      .connect(deployer)
+      .grant(dao.address, psp.address, DAO_PERMISSIONS.ROOT_PERMISSION_ID);
 
-      const plugin = Admin__factory.connect(
-        results.preparedEvent.args.plugin,
-        deployer
-      );
+    // Install build 1.
+    const results = await installPLugin(
+      deployer,
+      psp,
+      dao,
+      pluginSetupRef,
+      ethers.utils.defaultAbiCoder.encode(
+        getNamedTypesFromMetadata(
+          METADATA.build.pluginSetup.prepareInstallation.inputs
+        ),
+        [alice.address]
+      )
+    );
 
-      // Check that the setup worked
-      expect(await plugin.isMember(alice.address)).to.be.true;
+    const plugin = Admin__factory.connect(
+      results.preparedEvent.args.plugin,
+      deployer
+    );
 
-      // Uninstall build 1.
-      await uninstallPLugin(
-        psp,
-        dao,
-        plugin,
-        pluginSetupRef,
-        ethers.utils.defaultAbiCoder.encode(
-          getNamedTypesFromMetadata(
-            METADATA.build.pluginSetup.prepareUninstallation.inputs
-          ),
-          []
+    // Check that the setup worked
+    expect(await plugin.isMember(alice.address)).to.be.true;
+
+    // Uninstall build 1.
+    await uninstallPLugin(
+      deployer,
+      psp,
+      dao,
+      plugin,
+      pluginSetupRef,
+      ethers.utils.defaultAbiCoder.encode(
+        getNamedTypesFromMetadata(
+          METADATA.build.pluginSetup.prepareUninstallation.inputs
         ),
         []
-      );
-    });
+      ),
+      []
+    );
   });
 });
 
@@ -114,8 +134,8 @@ async function fixture(): Promise<FixtureResult> {
 
   const pluginSetupRef = {
     versionTag: {
-      release: BigNumber.from(1),
-      build: BigNumber.from(1),
+      release: VERSION.release,
+      build: VERSION.build,
     },
     pluginSetupRepo: pluginRepo.address,
   };

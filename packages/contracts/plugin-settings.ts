@@ -3,7 +3,7 @@ import releaseMetadata from './src/release-metadata.json';
 import {VersionTag} from '@aragon/osx-commons-sdk';
 
 export const PLUGIN_CONTRACT_NAME = 'Admin';
-export const PLUGIN_SETUP_CONTRACT_NAME = 'Admin';
+export const PLUGIN_SETUP_CONTRACT_NAME = 'AdminSetup';
 export const PLUGIN_REPO_ENS_SUBDOMAIN_NAME = 'admin'; // This will result in the ENS domain name 'my.plugin.dao.eth'
 
 export const VERSION: VersionTag = {
