@@ -71,7 +71,8 @@ contract AdminSetup is PluginSetup {
     }
 
     /// @inheritdoc IPluginSetup
-    /// @dev Currently, there is no reliable way to revoke the `ADMIN_EXECUTE_PERMISSION_ID` from all addresses it has been granted to. Accordingly, only the `EXECUTE_PERMISSION_ID` is revoked for this uninstallation.
+    /// @dev Currently, there is no reliable way to revoke the `ADMIN_EXECUTE_PERMISSION_ID` from all addresses
+    /// it has been granted to. Accordingly, only the `EXECUTE_PERMISSION_ID` is revoked for this uninstallation.
     function prepareUninstallation(
         address _dao,
         SetupPayload calldata _payload

@@ -1,11 +1,4 @@
-import {PLUGIN_REPO_ENS_SUBDOMAIN_NAME} from '../../plugin-settings';
-import {
-  findPluginRepo,
-  getManagementDao,
-  getProductionNetworkName,
-  pluginEnsDomain,
-} from '../../utils/helpers';
-import {getNetworkNameByAlias} from '@aragon/osx-commons-configs';
+import {findPluginRepo, getManagementDao} from '../../utils/helpers';
 import {
   DAO_PERMISSIONS,
   Operation,

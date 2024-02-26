@@ -5,6 +5,8 @@ pragma solidity ^0.8.8;
 import {SafeCastUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/math/SafeCastUpgradeable.sol";
 
 import {IMembership} from "@aragon/osx-commons-contracts/src/plugin/extensions/membership/IMembership.sol";
+
+// solhint-disable-next-line max-line-length
 import {ProposalUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol";
 import {PluginCloneable} from "@aragon/osx-commons-contracts/src/plugin/PluginCloneable.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
@@ -60,7 +62,9 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     /// @notice Creates and executes a new proposal.
     /// @param _metadata The metadata of the proposal.
     /// @param _actions The actions to be executed.
-    /// @param _allowFailureMap A bitmap allowing the proposal to succeed, even if individual actions might revert. If the bit at index `i` is 1, the proposal succeeds even if the `i`th action reverts. A failure map value of 0 requires every action to not revert.
+    /// @param _allowFailureMap A bitmap allowing the proposal to succeed, even if individual actions might revert.
+    /// If the bit at index `i` is 1, the proposal succeeds even if the `i`th action reverts. A failure map value
+    // of 0 requires every action to not revert.
     function executeProposal(
         bytes calldata _metadata,
         IDAO.Action[] calldata _actions,
