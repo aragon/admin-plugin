@@ -77,12 +77,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     []
   );
 
-  // If this is a local depoloyment and the deployer doesn't have `UPGRADE_REPO_PERMISSION_ID`  permission
+  // If this is a local depoloyment and the deployer doesn't have `UPGRADE_REPO_PERMISSION_ID` permission
   // we impersonate the management DAO for integration testing purposes.
-  const signer =
-    isDeployerUpgrader || !isLocal(hre)
-      ? deployer
-      : await impersonatedManagementDaoSigner(hre);
+  const signer = deployer;
+  isDeployerUpgrader || !isLocal(hre)
+    ? deployer
+    : await impersonatedManagementDaoSigner(hre);
 
   // Check if deployer has the permission to upgrade the plugin repo
   if (
@@ -104,21 +104,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       await pluginRepo.upgradeTo(latestPluginRepoImplementation.address);
     }
   } else {
-    // The deployer is not a repo maintainer and we are not deploying to a production network,
+    // The deployer does not have `UPGRADE_REPO_PERMISSION_ID` permission and we are not deploying to a production network,
     // so we write the data into a file for a management DAO member to create a proposal from it.
-
     const upgradeAction =
       initializeFromCalldata.length === 0
         ? {
             to: pluginRepo.address,
             upgradeTo: {
-              NewImplementation: latestPluginRepoImplementation,
+              NewImplementation: latestPluginRepoImplementation.address,
             },
           }
         : {
             to: pluginRepo.address,
             upgradeToAndCall: {
-              NewImplementation: latestPluginRepoImplementation,
+              NewImplementation: latestPluginRepoImplementation.address,
               Data: initializeFromCalldata,
               PayableAmount: 0,
             },
@@ -126,10 +125,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const data = {
       proposalTitle: `Upgrade the '${ensDomain}' plugin repo`,
       proposalSummary: `Upgrades '${ensDomain}' plugin repo at '${pluginRepo.address}',' plugin in the '${ensDomain}' plugin repo.`,
-      proposalDescription: ``,
+      proposalDescription: `TODO: Describe the changes to the 'PluginRepo' implementation.`,
       actions: [upgradeAction],
     };
-    // TODO Create one txn data object to directly create it from metamask.
 
     const path = `./upgradeRepoProposalData-${hre.network.name}.json`;
     await writeFile(path, JSON.stringify(data, null, 2));
@@ -185,7 +183,7 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
       `PluginRepo '${ensDomain}' (${pluginRepo.address}) has already been upgraded to 
       the current protocol version v${target[0]}.${target[1]}.${target[2]}. Skipping upgrade...`
     );
-    return true;
+    return false;
   }
 
   return false;

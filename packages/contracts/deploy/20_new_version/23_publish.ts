@@ -129,7 +129,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       `Published ${PLUGIN_SETUP_CONTRACT_NAME} at ${setup.address} in PluginRepo ${PLUGIN_REPO_ENS_SUBDOMAIN_NAME} at ${pluginRepo.address}.`
     );
   } else {
-    // The deployer is not a repo maintainer and we are not deploying to a production network,
+    // The deployer does not have `MAINTAINER_PERMISSION_ID` permission and we are not deploying to a production network,
     // so we write the data into a file for a management DAO member to create a proposal from it.
     const data = {
       proposalTitle: `Publish '${PLUGIN_CONTRACT_NAME}' plugin v${VERSION.release}.${VERSION.build}`,
@@ -149,7 +149,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         },
       ],
     };
-    // TODO Create one txn data object to directly create it from metamask.
 
     const path = `./createVersionProposalData-${hre.network.name}.json`;
     await writeFile(path, JSON.stringify(data, null, 2));
