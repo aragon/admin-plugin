@@ -92,7 +92,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     []
   );
 
-  // If this is a local depoloyment and the deployer doesn't have `MAINTAINER_PERMISSION_ID`  permission
+  // If this is a local deployment and the deployer doesn't have `MAINTAINER_PERMISSION_ID`  permission
   // we impersonate the management DAO for integration testing purposes.
   const signer =
     isDeployerMaintainer || !isLocal(hre)
