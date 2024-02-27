@@ -1,6 +1,6 @@
 {
   "ui": {},
-  "change": "This is the first build of the first release.",
+  "change": "This is the second build of the first release.",
   "pluginSetup": {
     "prepareInstallation": {
       "description": "The information required for the installation.",
