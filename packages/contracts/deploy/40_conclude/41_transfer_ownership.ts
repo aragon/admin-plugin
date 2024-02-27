@@ -23,10 +23,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // Get the management DAO address
   const managementDao = await getManagementDao(hre);
-
-  console.log(`Transferring ownership of the '${ensDomain}' plugin repo...`);
-
   const [deployer] = await hre.ethers.getSigners();
+
+  console.log(
+    `Transferring ownership of the '${ensDomain}' plugin repo  at '${pluginRepo.address}' from the deployer '${deployer.address}' to the management DAO at '${managementDao.address}'...`
+  );
 
   const permissions: DAOStructs.MultiTargetPermissionStruct[] = [
     // Grant to the managment DAO
@@ -49,7 +50,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       where: pluginRepo.address,
       who: managementDao.address,
       condition: PERMISSION_MANAGER_FLAGS.NO_CONDITION,
-      permissionId: DAO_PERMISSIONS.ROOT_PERMISSION_ID, // TODO put `ROOT_PERMISSION_ID` into `PLUGIN_REPO_PERMISSIONS`
+      permissionId: DAO_PERMISSIONS.ROOT_PERMISSION_ID,
     },
     // Revoke from deployer
     {
@@ -71,7 +72,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       where: pluginRepo.address,
       who: deployer.address,
       condition: PERMISSION_MANAGER_FLAGS.NO_CONDITION,
-      permissionId: DAO_PERMISSIONS.ROOT_PERMISSION_ID, // TODO put `ROOT_PERMISSION_ID` into `PLUGIN_REPO_PERMISSIONS`
+      permissionId: DAO_PERMISSIONS.ROOT_PERMISSION_ID,
     },
   ];
 
