@@ -84,7 +84,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ? deployer
     : await impersonatedManagementDaoSigner(hre);
 
-  // Check if deployer has the permission to upgrade the plugin repo
+  // Check if the signer has the permission to upgrade the plugin repo
   if (
     await pluginRepo.isGranted(
       pluginRepo.address,
