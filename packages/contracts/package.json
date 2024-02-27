@@ -1,5 +1,5 @@
 {
-  "name": "@aragon/osx-plugin-template-contracts",
+  "name": "@aragon/admin-plugin-contracts",
   "version": "1.0.0",
   "license": "AGPL-3.0-or-later",
   "scripts": {
