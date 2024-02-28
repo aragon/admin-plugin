@@ -390,20 +390,25 @@ async function fixture(): Promise<FixtureResult> {
     adminPluginImplementation.interface.encodeFunctionData('initialize', [
       dao.address,
     ]);
-  const tx1 = await adminProxyFactory.deployMinimalProxy(adminPluginInitdata);
-  const event1 = await findEvent<ProxyCreatedEvent>(
-    tx1,
+  const deploymentTx1 = await adminProxyFactory.deployMinimalProxy(
+    adminPluginInitdata
+  );
+  const proxyCreatedEvent1 = await findEvent<ProxyCreatedEvent>(
+    deploymentTx1,
     adminProxyFactory.interface.getEvent('ProxyCreated').name
   );
-  const initializedPlugin = Admin__factory.connect(event1.args.proxy, deployer);
+  const initializedPlugin = Admin__factory.connect(
+    proxyCreatedEvent1.args.proxy,
+    deployer
+  );
 
-  const tx2 = await adminProxyFactory.deployMinimalProxy([]);
-  const event2 = await findEvent<ProxyCreatedEvent>(
-    tx2,
+  const deploymentTx2 = await adminProxyFactory.deployMinimalProxy([]);
+  const proxyCreatedEvent2 = await findEvent<ProxyCreatedEvent>(
+    deploymentTx2,
     adminProxyFactory.interface.getEvent('ProxyCreated').name
   );
   const uninitializedPlugin = Admin__factory.connect(
-    event2.args.proxy,
+    proxyCreatedEvent2.args.proxy,
     deployer
   );
 
