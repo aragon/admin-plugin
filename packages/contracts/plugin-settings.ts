@@ -4,7 +4,7 @@ import {VersionTag} from '@aragon/osx-commons-sdk';
 
 export const PLUGIN_CONTRACT_NAME = 'Admin';
 export const PLUGIN_SETUP_CONTRACT_NAME = 'AdminSetup';
-export const PLUGIN_REPO_ENS_SUBDOMAIN_NAME = 'admin'; // This will result in the ENS domain name 'my.plugin.dao.eth'
+export const PLUGIN_REPO_ENS_SUBDOMAIN_NAME = 'admin'; // This will result in the ENS domain name admin.dao.eth'
 
 export const VERSION: VersionTag = {
   release: 1, // Increment this number ONLY if breaking/incompatible changes were made. Updates between releases are NOT possible.
