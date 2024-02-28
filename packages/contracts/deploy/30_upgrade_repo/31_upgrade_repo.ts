@@ -79,10 +79,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // If this is a local deployment and the deployer doesn't have `UPGRADE_REPO_PERMISSION_ID` permission
   // we impersonate the management DAO for integration testing purposes.
-  const signer = deployer;
-  isDeployerUpgrader || !isLocal(hre)
-    ? deployer
-    : await impersonatedManagementDaoSigner(hre);
+  const signer =
+    isDeployerUpgrader || !isLocal(hre)
+      ? deployer
+      : await impersonatedManagementDaoSigner(hre);
 
   // Check if the signer has the permission to upgrade the plugin repo
   if (
@@ -185,7 +185,7 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
       `PluginRepo '${ensDomain}' (${pluginRepo.address}) has already been upgraded to 
       the current protocol version v${target[0]}.${target[1]}.${target[2]}. Skipping upgrade...`
     );
-    return false;
+    return true;
   }
 
   return false;
