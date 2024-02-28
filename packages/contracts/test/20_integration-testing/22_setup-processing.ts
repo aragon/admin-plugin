@@ -10,6 +10,7 @@ import {
 import {
   DAO_PERMISSIONS,
   PLUGIN_SETUP_PROCESSOR_PERMISSIONS,
+  UnsupportedNetworkError,
   getNamedTypesFromMetadata,
 } from '@aragon/osx-commons-sdk';
 import {
@@ -113,10 +114,18 @@ async function fixture(): Promise<FixtureResult> {
   );
   const dao = await createDaoProxy(deployer, dummyMetadata);
 
+  const network = getNetworkNameByAlias(productionNetworkName);
+  if (network === null) {
+    throw new UnsupportedNetworkError(productionNetworkName);
+  }
+  const networkDeployments = getLatestNetworkDeployment(network);
+  if (networkDeployments === null) {
+    throw `Deployments are not available on network ${network}.`;
+  }
+
   // Get the `PluginSetupProcessor` from the network
   const psp = PluginSetupProcessor__factory.connect(
-    getLatestNetworkDeployment(getNetworkNameByAlias(productionNetworkName)!)!
-      .PluginSetupProcessor.address,
+    networkDeployments.PluginSetupProcessor.address,
     deployer
   );
 

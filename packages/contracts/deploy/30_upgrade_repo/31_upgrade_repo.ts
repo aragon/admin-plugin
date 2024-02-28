@@ -8,7 +8,10 @@ import {
   getLatestNetworkDeployment,
   getNetworkNameByAlias,
 } from '@aragon/osx-commons-configs';
-import {PLUGIN_REPO_PERMISSIONS} from '@aragon/osx-commons-sdk';
+import {
+  PLUGIN_REPO_PERMISSIONS,
+  UnsupportedNetworkError,
+} from '@aragon/osx-commons-sdk';
 import {PluginRepo__factory} from '@aragon/osx-ethers';
 import {BytesLike} from 'ethers';
 import {writeFile} from 'fs/promises';
@@ -21,6 +24,14 @@ type SemVer = [number, number, number];
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const [deployer] = await hre.ethers.getSigners();
   const productionNetworkName: string = getProductionNetworkName(hre);
+  const network = getNetworkNameByAlias(productionNetworkName);
+  if (network === null) {
+    throw new UnsupportedNetworkError(productionNetworkName);
+  }
+  const networkDeployments = getLatestNetworkDeployment(network);
+  if (networkDeployments === null) {
+    throw `Deployments are not available on network ${network}.`;
+  }
 
   // Get PluginRepo
   const {pluginRepo, ensDomain} = await findPluginRepo(hre);
@@ -34,8 +45,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // Get the latest `PluginRepo` implementation as the upgrade target
   const latestPluginRepoImplementation = PluginRepo__factory.connect(
-    getLatestNetworkDeployment(getNetworkNameByAlias(productionNetworkName)!)!
-      .PluginRepoBase.address,
+    networkDeployments.PluginRepoBase.address,
     deployer
   );
 
@@ -148,11 +158,18 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 
   const [deployer] = await hre.ethers.getSigners();
   const productionNetworkName: string = getProductionNetworkName(hre);
+  const network = getNetworkNameByAlias(productionNetworkName);
+  if (network === null) {
+    throw new UnsupportedNetworkError(productionNetworkName);
+  }
+  const networkDeployments = getLatestNetworkDeployment(network);
+  if (networkDeployments === null) {
+    throw `Deployments are not available on network ${network}.`;
+  }
 
   // Get the latest `PluginRepo` implementation as the upgrade target
   const latestPluginRepoImplementation = PluginRepo__factory.connect(
-    getLatestNetworkDeployment(getNetworkNameByAlias(productionNetworkName)!)!
-      .PluginRepoBase.address,
+    networkDeployments.PluginRepoBase.address,
     deployer
   );
 

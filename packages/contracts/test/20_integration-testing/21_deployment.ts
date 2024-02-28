@@ -8,6 +8,7 @@ import {
   DAO_PERMISSIONS,
   PERMISSION_MANAGER_FLAGS,
   PLUGIN_REPO_PERMISSIONS,
+  UnsupportedNetworkError,
   toHex,
   uploadToIPFS,
 } from '@aragon/osx-commons-sdk';
@@ -106,17 +107,24 @@ async function fixture(): Promise<FixtureResult> {
     throw `PluginRepo '${ensDomain}' does not exist yet.`;
   }
 
+  const network = getNetworkNameByAlias(productionNetworkName);
+  if (network === null) {
+    throw new UnsupportedNetworkError(productionNetworkName);
+  }
+  const networkDeployments = getLatestNetworkDeployment(network);
+  if (networkDeployments === null) {
+    throw `Deployments are not available on network ${network}.`;
+  }
+
   // Plugin repo registry
   const pluginRepoRegistry = PluginRepoRegistry__factory.connect(
-    getLatestNetworkDeployment(getNetworkNameByAlias(productionNetworkName)!)!
-      .PluginRepoRegistryProxy.address,
+    networkDeployments.PluginRepoRegistryProxy.address,
     deployer
   );
 
   // Management DAO proxy
   const managementDaoProxy = DAO__factory.connect(
-    getLatestNetworkDeployment(getNetworkNameByAlias(productionNetworkName)!)!
-      .ManagementDAOProxy.address,
+    networkDeployments.ManagementDAOProxy.address,
     deployer
   );
 
