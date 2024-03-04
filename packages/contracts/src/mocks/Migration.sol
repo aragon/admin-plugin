@@ -5,7 +5,7 @@ pragma solidity ^0.8.8;
 /**
  * @title Migration
  *
- * @dev This file allows importing contracts to obtain compiler artifacts for testings purposes.
+ * @dev This file allows importing contracts to obtain compiler artifacts for testing purposes.
  *
  * After a contract is imported here and the project is compiled, an associated artifact will be
  * generated inside artifacts/@aragon/{version-name}/*,
