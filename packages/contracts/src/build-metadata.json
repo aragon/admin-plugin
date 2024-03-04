@@ -1,10 +1,6 @@
 {
-  "version": {
-    "release": 1,
-    "build": 2
-  },
   "ui": {},
-  "change": "This is the second build of the first release.",
+  "change": "v1.2\n - TODO TODO",
   "pluginSetup": {
     "prepareInstallation": {
       "description": "The information required for the installation.",
