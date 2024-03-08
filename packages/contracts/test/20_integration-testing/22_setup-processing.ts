@@ -1,8 +1,7 @@
-import {createDaoProxy} from '../10_unit-testing/11_plugin';
 import {METADATA, VERSION} from '../../plugin-settings';
 import {AdminSetup, AdminSetup__factory, Admin__factory} from '../../typechain';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
-import {installPLugin, uninstallPLugin} from './test-helpers';
+import {createDaoProxy, installPLugin, uninstallPLugin} from './test-helpers';
 import {
   getLatestNetworkDeployment,
   getNetworkNameByAlias,
