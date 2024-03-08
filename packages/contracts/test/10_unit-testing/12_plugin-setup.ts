@@ -1,3 +1,4 @@
+import {createDaoProxy} from '../20_integration-testing/test-helpers';
 import {PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
 import buildMetadata from '../../src/build-metadata.json';
 import {AdminSetup, Admin__factory, AdminSetup__factory} from '../../typechain';
@@ -5,7 +6,6 @@ import {
   ADMIN_INTERFACE,
   EXECUTE_PROPOSAL_PERMISSION_ID,
 } from '../admin-constants';
-import {createDaoProxy} from './11_plugin';
 import {
   Operation,
   DAO_PERMISSIONS,
