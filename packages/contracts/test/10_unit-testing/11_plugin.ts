@@ -1,3 +1,4 @@
+import {createDaoProxy} from '../20_integration-testing/test-helpers';
 import {PLUGIN_CONTRACT_NAME} from '../../plugin-settings';
 import {
   Admin,
@@ -22,7 +23,7 @@ import {
   getInterfaceId,
   DAO_PERMISSIONS,
 } from '@aragon/osx-commons-sdk';
-import {DAO, DAOEvents, DAOStructs, DAO__factory} from '@aragon/osx-ethers';
+import {DAO, DAOEvents, DAOStructs} from '@aragon/osx-ethers';
 import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
