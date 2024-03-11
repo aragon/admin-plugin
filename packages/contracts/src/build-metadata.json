@@ -1,6 +1,6 @@
 {
   "ui": {},
-  "change": "v1.2\n - TODO TODO",
+  "change": "v1.2\n [PLACEHOLDER for describing the changes in the upcoming build.]",
   "pluginSetup": {
     "prepareInstallation": {
       "description": "The information required for the installation.",
