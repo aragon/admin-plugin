@@ -32,23 +32,48 @@ dataSources:
   {{/dataSources.PluginSetupProcessors}}
 # templates
 templates:
-  # Plugin (package)
+  # Plugin
   - name: Plugin
     kind: ethereum/contract
     network: {{network}}
     source:
-      abi: Plugin
+      abi: Admin
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Dao
-      abis:
-        - name: Plugin
-          file: $PLUGIN_MODULE/contracts/artifacts/src/MyPlugin.sol/MyPlugin.json
-      eventHandlers:
-        - event: NumberStored(uint256)
-          handler: handleNumberStored
+        - AdminPlugin
+        - AdminProposal
+        - Action
       file: ./src/plugin/plugin.ts
-
+      abis:
+        - name: Admin
+          file: $PLUGIN_MODULE/contracts/artifacts/src/Admin.sol/Admin.json
+      eventHandlers:
+        - event: MembershipContractAnnounced(indexed address)
+          handler: handleMembershipContractAnnounced
+        - event: ProposalExecuted(indexed uint256)
+          handler: handleProposalExecuted
+        - event: ProposalCreated(indexed uint256,indexed address,uint64,uint64,bytes,(address,uint256,bytes)[],uint256)
+          handler: handleProposalCreated
+  - name: AdminMembers
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: PermissionManager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Administrator
+      file: ./src/plugin/adminMembers.ts
+      abis:
+        - name: PermissionManager
+          file: ./imported/PermissionManager.json
+      eventHandlers:
+        - event: Granted(indexed bytes32,indexed address,address,indexed address,address)
+          handler: handleGranted
+        - event: Revoked(indexed bytes32,indexed address,address,indexed address)
+          handler: handleRevoked     
