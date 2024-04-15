@@ -30,10 +30,7 @@ type FixtureResult = {
 
 async function fixture(): Promise<FixtureResult> {
   const [deployer, alice, bob] = await ethers.getSigners();
-
-  const dummyMetadata = ethers.utils.hexlify(
-    ethers.utils.toUtf8Bytes('0x123456789')
-  );
+  const dummyMetadata = '0x12345678';
   const dao = await createDaoProxy(deployer, dummyMetadata);
   const pluginSetup = await new AdminSetup__factory(deployer).deploy();
 
