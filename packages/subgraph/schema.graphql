@@ -75,3 +75,11 @@ type Action implements IAction @entity(immutable: true) {
   # proposal data
   proposal: IProposal!
 }
+
+type IAction @entity {
+    id: ID! #action entity id
+    daoAddress: Bytes!
+    to: Bytes!
+    value: BigInt!
+    data: Bytes!
+}
