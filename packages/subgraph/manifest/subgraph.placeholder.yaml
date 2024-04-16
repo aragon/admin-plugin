@@ -1,6 +1,6 @@
 {{info}}
 specVersion: 0.0.2
-description: The Subgraph of the Admin Plugin
+description: The schema for the Admin plugin subgraph
 repository: https://github.com/aragon/admin-plugin
 schema:
   file: ./schema.graphql
