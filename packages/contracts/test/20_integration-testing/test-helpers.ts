@@ -1,6 +1,5 @@
 import {IPlugin, ProxyFactory__factory} from '../../typechain';
 import {ProxyCreatedEvent} from '../../typechain/@aragon/osx-commons-contracts/src/utils/deployment/ProxyFactory';
-import {hashHelpers} from '../../utils/helpers';
 import {
   DAO_PERMISSIONS,
   PLUGIN_SETUP_PROCESSOR_PERMISSIONS,
@@ -37,8 +36,8 @@ export async function installPLugin(
   });
 
   const preparedEvent =
-    await findEvent<PluginSetupProcessorEvents.InstallationPreparedEvent>(
-      prepareTx,
+    findEvent<PluginSetupProcessorEvents.InstallationPreparedEvent>(
+      await prepareTx.wait(),
       psp.interface.getEvent('InstallationPrepared').name
     );
 
@@ -57,12 +56,17 @@ export async function installPLugin(
     pluginSetupRef: pluginSetupRef,
     plugin: plugin,
     permissions: preparedPermissions,
-    helpersHash: hashHelpers(preparedEvent.args.preparedSetupData.helpers),
+    helpersHash: ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        ['address[]'],
+        [preparedEvent.args.preparedSetupData.helpers]
+      )
+    ),
   });
 
   const appliedEvent =
-    await findEvent<PluginSetupProcessorEvents.InstallationAppliedEvent>(
-      applyTx,
+    findEvent<PluginSetupProcessorEvents.InstallationAppliedEvent>(
+      await applyTx.wait(),
       psp.interface.getEvent('InstallationApplied').name
     );
 
@@ -96,7 +100,7 @@ export async function uninstallPLugin(
 
   const preparedEvent =
     await findEvent<PluginSetupProcessorEvents.UninstallationPreparedEvent>(
-      prepareTx,
+      await prepareTx.wait(),
       psp.interface.getEvent('UninstallationPrepared').name
     );
 
@@ -117,8 +121,8 @@ export async function uninstallPLugin(
   });
 
   const appliedEvent =
-    await findEvent<PluginSetupProcessorEvents.UninstallationAppliedEvent>(
-      applyTx,
+    findEvent<PluginSetupProcessorEvents.UninstallationAppliedEvent>(
+      await applyTx.wait(),
       psp.interface.getEvent('UninstallationApplied').name
     );
 
@@ -154,8 +158,8 @@ export async function updatePlugin(
     },
   });
   const preparedEvent =
-    await findEvent<PluginSetupProcessorEvents.UpdatePreparedEvent>(
-      prepareTx,
+    findEvent<PluginSetupProcessorEvents.UpdatePreparedEvent>(
+      await prepareTx.wait(),
       psp.interface.getEvent('UpdatePrepared').name
     );
 
@@ -174,13 +178,17 @@ export async function updatePlugin(
     pluginSetupRef: pluginSetupRefUpdate,
     initData: preparedEvent.args.initData,
     permissions: preparedPermissions,
-    helpersHash: hashHelpers(preparedEvent.args.preparedSetupData.helpers),
+    helpersHash: ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        ['address[]'],
+        [preparedEvent.args.preparedSetupData.helpers]
+      )
+    ),
   });
-  const appliedEvent =
-    await findEvent<PluginSetupProcessorEvents.UpdateAppliedEvent>(
-      applyTx,
-      psp.interface.getEvent('UpdateApplied').name
-    );
+  const appliedEvent = findEvent<PluginSetupProcessorEvents.UpdateAppliedEvent>(
+    await applyTx.wait(),
+    psp.interface.getEvent('UpdateApplied').name
+  );
 
   return {prepareTx, applyTx, preparedEvent, appliedEvent};
 }
@@ -237,8 +245,8 @@ export async function createDaoProxy(
     ]
   );
   const tx = await daoProxyFactory.deployUUPSProxy(daoInitData);
-  const event = await findEvent<ProxyCreatedEvent>(
-    tx,
+  const event = findEvent<ProxyCreatedEvent>(
+    await tx.wait(),
     daoProxyFactory.interface.getEvent('ProxyCreated').name
   );
   const dao = DAO__factory.connect(event.args.proxy, deployer);
