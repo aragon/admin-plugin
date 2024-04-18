@@ -13,5 +13,6 @@ and this project adheres to the [Aragon OSx Plugin Versioning Convention](https:
 
 ### Changed
 
+- Bumped OpenZepplin to `4.9.6`.
 - Used `ProxyLib` from `osx-commons-contracts` for the minimal proxy deployment in `AdminSetup`.
 - Hard-coded the `bytes32 internal constant EXECUTE_PERMISSION_ID` constant in `AdminSetup` until it is available in `PermissionLib`.
