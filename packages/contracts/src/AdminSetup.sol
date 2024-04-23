@@ -11,7 +11,7 @@ import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
 import {Admin} from "./Admin.sol";
 
 /// @title AdminAddressSetup
-/// @author Aragon Association - 2022-2023
+/// @author Aragon X - 2022-2023
 /// @notice The setup contract of the `Admin` plugin.
 /// @dev v1.2 (Release 1, Build 2)
 /// @custom:security-contact sirt@aragon.org
