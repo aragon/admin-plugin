@@ -10,6 +10,8 @@ import {IMembership} from "@aragon/osx-commons-contracts/src/plugin/extensions/m
 import {ProposalUpgradeable} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol";
 import {PluginCloneable} from "@aragon/osx-commons-contracts/src/plugin/PluginCloneable.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
+import {IProposal} from "@aragon/osx-commons-contracts/src/plugin/extensions/proposal/IProposal.sol";
+import {Action} from "@aragon/osx-commons-contracts/src/executors/IExecutor.sol";
 
 /// @title Admin
 /// @author Aragon X - 2022-2023
@@ -20,8 +22,7 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     using SafeCastUpgradeable for uint256;
 
     /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
-    bytes4 internal constant ADMIN_INTERFACE_ID =
-        this.initialize.selector ^ this.executeProposal.selector;
+    bytes4 internal constant ADMIN_INTERFACE_ID = this.executeProposal.selector;
 
     /// @notice The ID of the permission required to call the `executeProposal` function.
     bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
@@ -30,8 +31,10 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     /// @notice Initializes the contract.
     /// @param _dao The associated DAO.
     /// @dev This method is required to support [ERC-1167](https://eips.ethereum.org/EIPS/eip-1167).
-    function initialize(IDAO _dao) external initializer {
+    function initialize(IDAO _dao, TargetConfig calldata _targetConfig) external initializer {
         __PluginCloneable_init(_dao);
+
+        _setTargetConfig(_targetConfig);
 
         emit MembershipContractAnnounced({definingContract: address(_dao)});
     }
@@ -59,6 +62,34 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
             });
     }
 
+    /// @inheritdoc IProposal
+    function customProposalParamsABI() external pure override returns (string memory) {
+        return "(uint256 allowFailureMap)";
+    }
+
+    /// @inheritdoc IProposal
+    function createProposal(
+        bytes calldata _metadata,
+        Action[] calldata _actions,
+        uint64,
+        uint64,
+        bytes memory _data
+    ) public override returns (uint256 proposalId) {
+        uint256 allowFailureMap;
+
+        if (_data.length > 0) {
+            allowFailureMap = abi.decode(_data, (uint256));
+        }
+
+        // Uses public function for permission check.
+        proposalId = executeProposal(_metadata, _actions, allowFailureMap);
+    }
+
+    /// @inheritdoc IProposal
+    function canExecute(uint256) public view virtual override returns (bool) {
+        return true;
+    }
+
     /// @notice Creates and executes a new proposal.
     /// @param _metadata The metadata of the proposal.
     /// @param _actions The actions to be executed.
@@ -67,19 +98,33 @@ contract Admin is IMembership, PluginCloneable, ProposalUpgradeable {
     // of 0 requires every action to not revert.
     function executeProposal(
         bytes calldata _metadata,
-        IDAO.Action[] calldata _actions,
+        Action[] calldata _actions,
         uint256 _allowFailureMap
-    ) external auth(EXECUTE_PROPOSAL_PERMISSION_ID) {
-        uint64 currentTimestamp64 = block.timestamp.toUint64();
+    ) public auth(EXECUTE_PROPOSAL_PERMISSION_ID) returns (uint256 proposalId) {
+        uint64 currentTimestamp = block.timestamp.toUint64();
 
-        uint256 proposalId = _createProposal({
-            _creator: _msgSender(),
-            _metadata: _metadata,
-            _startDate: currentTimestamp64,
-            _endDate: currentTimestamp64,
-            _actions: _actions,
-            _allowFailureMap: _allowFailureMap
-        });
-        _executeProposal(dao(), proposalId, _actions, _allowFailureMap);
+        proposalId = _createProposalId(keccak256(abi.encode(_actions, _metadata)));
+
+        TargetConfig memory targetConfig = getTargetConfig();
+
+        _execute(
+            targetConfig.target,
+            bytes32(proposalId),
+            _actions,
+            _allowFailureMap,
+            targetConfig.operation
+        );
+
+        emit ProposalCreated(
+            proposalId,
+            _msgSender(),
+            currentTimestamp,
+            currentTimestamp,
+            _metadata,
+            _actions,
+            _allowFailureMap
+        );
+
+        emit ProposalExecuted(proposalId);
     }
 }

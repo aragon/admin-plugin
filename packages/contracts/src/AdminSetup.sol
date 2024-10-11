@@ -7,6 +7,7 @@ import {PluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/Plugin
 import {PermissionLib} from "@aragon/osx-commons-contracts/src/permission/PermissionLib.sol";
 import {ProxyLib} from "@aragon/osx-commons-contracts/src/utils/deployment/ProxyLib.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
+import {IPlugin} from "@aragon/osx-commons-contracts/src/plugin/IPlugin.sol";
 
 import {Admin} from "./Admin.sol";
 
@@ -18,9 +19,12 @@ import {Admin} from "./Admin.sol";
 contract AdminSetup is PluginSetup {
     using ProxyLib for address;
 
-    // TODO This permission identifier has to be moved inside `PermissionLib` as per task OS-954.
     /// @notice The ID of the permission required to call the `execute` function.
     bytes32 internal constant EXECUTE_PERMISSION_ID = keccak256("EXECUTE_PERMISSION");
+
+    /// @notice The ID of the permission required to call the `executeProposal` function.
+    bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
+        keccak256("EXECUTE_PROPOSAL_PERMISSION");
 
     /// @notice Thrown if the admin address is zero.
     /// @param admin The admin address.
@@ -35,14 +39,17 @@ contract AdminSetup is PluginSetup {
         bytes calldata _data
     ) external returns (address plugin, PreparedSetupData memory preparedSetupData) {
         // Decode `_data` to extract the params needed for cloning and initializing the `Admin` plugin.
-        address admin = abi.decode(_data, (address));
+        (address admin, IPlugin.TargetConfig memory targetConfig) = abi.decode(
+            _data,
+            (address, IPlugin.TargetConfig)
+        );
 
         if (admin == address(0)) {
             revert AdminAddressInvalid({admin: admin});
         }
 
         // Clone and initialize the plugin contract.
-        bytes memory initData = abi.encodeCall(Admin.initialize, (IDAO(_dao)));
+        bytes memory initData = abi.encodeCall(Admin.initialize, (IDAO(_dao), targetConfig));
         plugin = IMPLEMENTATION.deployMinimalProxy(initData);
 
         // Prepare permissions
@@ -55,7 +62,7 @@ contract AdminSetup is PluginSetup {
             where: plugin,
             who: admin,
             condition: PermissionLib.NO_CONDITION,
-            permissionId: Admin(plugin).EXECUTE_PROPOSAL_PERMISSION_ID()
+            permissionId: EXECUTE_PROPOSAL_PERMISSION_ID
         });
 
         // Grant `EXECUTE_PERMISSION` on the DAO to the plugin.

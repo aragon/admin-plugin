@@ -5,7 +5,9 @@ import {AdminSetup, Admin__factory, AdminSetup__factory} from '../../typechain';
 import {
   ADMIN_INTERFACE,
   EXECUTE_PROPOSAL_PERMISSION_ID,
+  TargetConfig,
 } from '../admin-constants';
+import {Operation as Op} from '../admin-constants';
 import {
   Operation,
   DAO_PERMISSIONS,
@@ -26,6 +28,7 @@ type FixtureResult = {
   prepareInstallationInputs: string;
   prepareUninstallationInputs: string;
   dao: DAO;
+  targetConfig: TargetConfig;
 };
 
 async function fixture(): Promise<FixtureResult> {
@@ -34,11 +37,16 @@ async function fixture(): Promise<FixtureResult> {
   const dao = await createDaoProxy(deployer, dummyMetadata);
   const pluginSetup = await new AdminSetup__factory(deployer).deploy();
 
+  const targetConfig: TargetConfig = {
+    operation: Op.call,
+    target: dao.address,
+  };
+
   const prepareInstallationInputs = ethers.utils.defaultAbiCoder.encode(
     getNamedTypesFromMetadata(
       buildMetadata.pluginSetup.prepareInstallation.inputs
     ),
-    [alice.address]
+    [alice.address, targetConfig]
   );
   const prepareUninstallationInputs = ethers.utils.defaultAbiCoder.encode(
     getNamedTypesFromMetadata(
@@ -55,6 +63,7 @@ async function fixture(): Promise<FixtureResult> {
     prepareInstallationInputs,
     prepareUninstallationInputs,
     dao,
+    targetConfig,
   };
 }
 
@@ -98,13 +107,13 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
     });
 
     it('reverts if encoded address in `_data` is zero', async () => {
-      const {pluginSetup, dao} = await loadFixture(fixture);
+      const {pluginSetup, dao, targetConfig} = await loadFixture(fixture);
 
       const dataWithAddressZero = ethers.utils.defaultAbiCoder.encode(
         getNamedTypesFromMetadata(
           buildMetadata.pluginSetup.prepareInstallation.inputs
         ),
-        [ethers.constants.AddressZero]
+        [ethers.constants.AddressZero, targetConfig]
       );
 
       await expect(

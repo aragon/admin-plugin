@@ -1,6 +1,7 @@
 import {METADATA, VERSION} from '../../plugin-settings';
 import {AdminSetup, AdminSetup__factory, Admin__factory} from '../../typechain';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
+import {Operation, TargetConfig} from '../admin-constants';
 import {createDaoProxy, installPLugin, uninstallPLugin} from './test-helpers';
 import {
   getLatestNetworkDeployment,
@@ -28,9 +29,8 @@ const productionNetworkName = getProductionNetworkName(env);
 
 describe(`PluginSetup processing on network '${productionNetworkName}'`, function () {
   it('installs & uninstalls the current build', async () => {
-    const {alice, deployer, psp, dao, pluginSetupRef} = await loadFixture(
-      fixture
-    );
+    const {alice, deployer, psp, dao, pluginSetupRef, targetConfig} =
+      await loadFixture(fixture);
 
     // Grant deployer all required permissions
     await dao
@@ -61,7 +61,7 @@ describe(`PluginSetup processing on network '${productionNetworkName}'`, functio
         getNamedTypesFromMetadata(
           METADATA.build.pluginSetup.prepareInstallation.inputs
         ),
-        [alice.address]
+        [alice.address, targetConfig]
       )
     );
 
@@ -100,6 +100,7 @@ type FixtureResult = {
   pluginRepo: PluginRepo;
   pluginSetup: AdminSetup;
   pluginSetupRef: PluginSetupProcessorStructs.PluginSetupRefStruct;
+  targetConfig: TargetConfig;
 };
 
 async function fixture(): Promise<FixtureResult> {
@@ -138,6 +139,11 @@ async function fixture(): Promise<FixtureResult> {
     deployer
   );
 
+  const targetConfig: TargetConfig = {
+    operation: Operation.call,
+    target: dao.address,
+  };
+
   const pluginSetupRef = {
     versionTag: {
       release: VERSION.release,
@@ -155,5 +161,6 @@ async function fixture(): Promise<FixtureResult> {
     pluginRepo,
     pluginSetup,
     pluginSetupRef,
+    targetConfig,
   };
 }

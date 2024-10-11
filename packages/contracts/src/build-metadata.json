@@ -10,6 +10,26 @@
           "name": "admin",
           "type": "address",
           "description": "The address of the admin account receiving the `EXECUTE_PERMISSION_ID` permission."
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address",
+              "description": "The target contract to which actions will be forwarded to for execution."
+            },
+            {
+              "internalType": "uint8",
+              "name": "operation",
+              "type": "uint8",
+              "description": "The operation type(either `call` or `delegatecall`) that will be used for execution forwarding."
+            }
+          ],
+          "internalType": "struct TokenVoting.TargetConfig",
+          "name": "TargetConfig",
+          "type": "tuple",
+          "description": "The initial target config"
         }
       ]
     },
