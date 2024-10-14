@@ -111,8 +111,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       .createVersion(
         VERSION.release,
         setup.address,
-        ethers.utils.hexlify(ethers.utils.toUtf8Bytes(buildMetadataURI)),
-        ethers.utils.hexlify(ethers.utils.toUtf8Bytes(releaseMetadataURI))
+        buildMetadataURI,
+        releaseMetadataURI
       );
 
     await tx.wait();
