@@ -40,12 +40,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Get the Aragon `PluginRepoFactory` from the `osx-commons-configs`
   let pluginRepoFactoryAddress;
   let subdomainRegistrar;
-  if (process.env.PLUGIN_REPO_FACTORY_ADDRESS) {
+  if (
+    process.env.PLUGIN_REPO_FACTORY_ADDRESS &&
+    process.env.PLUGIN_REPO_FACTORY_ADDRESS !== ethers.constants.AddressZero
+  ) {
     // use this factory
     pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
 
     const pluginRepoFactory = PluginRepoFactory__factory.connect(
-      process.env.PLUGIN_REPO_FACTORY_ADDRESS,
+      pluginRepoFactoryAddress,
       deployer
     );
 
