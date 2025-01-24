@@ -15,6 +15,8 @@ import {
   PluginRepo,
   PluginRepoEvents,
   PluginRepo__factory,
+  PluginRepoFactory__factory,
+  PluginRepoRegistry__factory,
 } from '@aragon/osx-ethers';
 import {setBalance} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
@@ -69,21 +71,51 @@ export async function findPluginRepo(
   hre: HardhatRuntimeEnvironment
 ): Promise<{pluginRepo: PluginRepo | null; ensDomain: string}> {
   const [deployer] = await hre.ethers.getSigners();
-  const productionNetworkName: string = getProductionNetworkName(hre);
 
-  const network = getNetworkNameByAlias(productionNetworkName);
-  if (network === null) {
-    throw new UnsupportedNetworkError(productionNetworkName);
-  }
-  const networkDeployments = getLatestNetworkDeployment(network);
-  if (networkDeployments === null) {
-    throw `Deployments are not available on network ${network}.`;
+  let subdomainRegistrarAddress;
+  if (
+    process.env.PLUGIN_REPO_FACTORY_ADDRESS &&
+    process.env.PLUGIN_REPO_FACTORY_ADDRESS !== ethers.constants.AddressZero
+  ) {
+    // get ENS registrar from the plugin factory provided
+    const pluginRepoFactory = PluginRepoFactory__factory.connect(
+      process.env.PLUGIN_REPO_FACTORY_ADDRESS,
+      deployer
+    );
+
+    const pluginRepoRegistry = PluginRepoRegistry__factory.connect(
+      await pluginRepoFactory.pluginRepoRegistry(),
+      deployer
+    );
+
+    subdomainRegistrarAddress = await pluginRepoRegistry.subdomainRegistrar();
+  } else {
+    // get ENS registrar from the commons configs deployments
+    const productionNetworkName: string = getProductionNetworkName(hre);
+
+    const network = getNetworkNameByAlias(productionNetworkName);
+    if (network === null) {
+      throw new UnsupportedNetworkError(productionNetworkName);
+    }
+    const networkDeployments = getLatestNetworkDeployment(network);
+    if (networkDeployments === null) {
+      throw `Deployments are not available on network ${network}.`;
+    }
+
+    subdomainRegistrarAddress =
+      networkDeployments.PluginENSSubdomainRegistrarProxy.address;
   }
 
-  const registrar = ENSSubdomainRegistrar__factory.connect(
-    networkDeployments.PluginENSSubdomainRegistrarProxy.address,
-    deployer
-  );
+  let registrar;
+  if (subdomainRegistrarAddress === ethers.constants.AddressZero) {
+    // the network does not support ENS
+    return {pluginRepo: null, ensDomain: ''};
+  } else {
+    registrar = ENSSubdomainRegistrar__factory.connect(
+      subdomainRegistrarAddress,
+      deployer
+    );
+  }
 
   // Check if the ens record exists already
   const ens = ENS__factory.connect(await registrar.ens(), deployer);

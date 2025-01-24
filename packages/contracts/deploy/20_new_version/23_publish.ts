@@ -140,11 +140,24 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       []
     )
   ) {
-    const placeholderSetup = getLatestContractAddress('PlaceholderSetup', hre);
+    let placeholderSetup = getLatestContractAddress('PlaceholderSetup', hre);
+
     if (placeholderSetup == '') {
-      throw new Error(
-        'Aborting. Placeholder setup not present in this network'
-      );
+      // deploy placeholder setup
+      const {deploy} = deployments;
+      const res = await deploy(PLUGIN_SETUP_CONTRACT_NAME, {
+        from: deployer.address,
+        args: [],
+        log: true,
+      });
+
+      placeholderSetup = res.address;
+
+      // Queue the placeholder for verification
+      hre.aragonToVerifyContracts.push({
+        address: placeholderSetup,
+        args: [],
+      });
     }
     if (latestBuild == 0 && VERSION.build > 1) {
       for (let i = 0; i < VERSION.build - 1; i++) {
