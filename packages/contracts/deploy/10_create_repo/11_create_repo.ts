@@ -41,6 +41,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let subdomainRegistrar;
 
   if (pluginRepoFactoryAddress) {
+    if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
+      throw new Error('Plugin Repo Factory in .env is not of type Address');
+    }
     // use this factory
     const pluginRepoFactory = PluginRepoFactory__factory.connect(
       pluginRepoFactoryAddress,
@@ -101,7 +104,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(
     `PluginRepo ${
       subdomainRegistrar !== ethers.constants.AddressZero
-    } ? '${pluginEnsDomain(hre)}' : ${''} deployed at '${pluginRepo.address}'.`
+        ? 'with ens:' + pluginEnsDomain(hre)
+        : 'without ens'
+    }  deployed at '${pluginRepo.address}'.`
   );
 
   hre.aragonToVerifyContracts.push({
