@@ -87,7 +87,7 @@ export async function findPluginRepo(
   }
 
   let subdomainRegistrarAddress;
-  let pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
+  const pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
 
   if (pluginRepoFactoryAddress) {
     if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {

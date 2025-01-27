@@ -122,8 +122,8 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 
   // try getting the plugin repo.
   const res = await findPluginRepo(hre);
-  let pluginRepoAddress = res.pluginRepo?.address;
-  let ensDomain = res.ensDomain;
+  const pluginRepoAddress = res.pluginRepo?.address;
+  const ensDomain = res.ensDomain;
 
   if (pluginRepoAddress) {
     if (ensDomain != '') {

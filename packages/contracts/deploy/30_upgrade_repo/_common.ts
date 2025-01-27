@@ -48,7 +48,7 @@ export async function fetchData(
 
   // Get the latest `PluginRepo` implementation as the upgrade target
   let latestPluginRepoImplementation;
-  let pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
+  const pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
 
   if (pluginRepoFactoryAddress) {
     if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
