@@ -48,12 +48,15 @@ export async function fetchData(
 
   // Get the latest `PluginRepo` implementation as the upgrade target
   let latestPluginRepoImplementation;
-  if (
-    process.env.PLUGIN_REPO_FACTORY_ADDRESS &&
-    process.env.PLUGIN_REPO_FACTORY_ADDRESS !== ethers.constants.AddressZero
-  ) {
+  let pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
+
+  if (pluginRepoFactoryAddress) {
+    if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
+      throw new Error('Plugin Repo Factory in .env is not of type Address');
+    }
+
     const pluginRepoFactory = PluginRepoFactory__factory.connect(
-      process.env.PLUGIN_REPO_FACTORY_ADDRESS,
+      pluginRepoFactoryAddress,
       deployer
     );
     latestPluginRepoImplementation = PluginRepo__factory.connect(

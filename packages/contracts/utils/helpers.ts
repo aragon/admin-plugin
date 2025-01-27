@@ -72,14 +72,29 @@ export async function findPluginRepo(
 ): Promise<{pluginRepo: PluginRepo | null; ensDomain: string}> {
   const [deployer] = await hre.ethers.getSigners();
 
-  let subdomainRegistrarAddress;
   if (
-    process.env.PLUGIN_REPO_FACTORY_ADDRESS &&
-    process.env.PLUGIN_REPO_FACTORY_ADDRESS !== ethers.constants.AddressZero
+    process.env.PLUGIN_REPO_ADDRESS &&
+    ethers.utils.isAddress(process.env.PLUGIN_REPO_ADDRESS)
   ) {
+    return {
+      pluginRepo: PluginRepo__factory.connect(
+        process.env.PLUGIN_REPO_ADDRESS,
+        deployer
+      ),
+      ensDomain: '',
+    };
+  }
+
+  let subdomainRegistrarAddress;
+  let pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
+
+  if (pluginRepoFactoryAddress) {
+    if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
+      throw new Error('Plugin Repo Factory in .env is not of type Address');
+    }
     // get ENS registrar from the plugin factory provided
     const pluginRepoFactory = PluginRepoFactory__factory.connect(
-      process.env.PLUGIN_REPO_FACTORY_ADDRESS,
+      pluginRepoFactoryAddress,
       deployer
     );
 
@@ -110,12 +125,12 @@ export async function findPluginRepo(
   if (subdomainRegistrarAddress === ethers.constants.AddressZero) {
     // the network does not support ENS
     return {pluginRepo: null, ensDomain: ''};
-  } else {
-    registrar = ENSSubdomainRegistrar__factory.connect(
-      subdomainRegistrarAddress,
-      deployer
-    );
   }
+
+  registrar = ENSSubdomainRegistrar__factory.connect(
+    subdomainRegistrarAddress,
+    deployer
+  );
 
   // Check if the ens record exists already
   const ens = ENS__factory.connect(await registrar.ens(), deployer);

@@ -37,16 +37,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const [deployer] = await hre.ethers.getSigners();
 
-  // Get the Aragon `PluginRepoFactory` from the `osx-commons-configs`
-  let pluginRepoFactoryAddress;
+  let pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
   let subdomainRegistrar;
-  if (
-    process.env.PLUGIN_REPO_FACTORY_ADDRESS &&
-    process.env.PLUGIN_REPO_FACTORY_ADDRESS !== ethers.constants.AddressZero
-  ) {
-    // use this factory
-    pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
 
+  if (pluginRepoFactoryAddress) {
+    // use this factory
     const pluginRepoFactory = PluginRepoFactory__factory.connect(
       pluginRepoFactoryAddress,
       deployer
@@ -77,7 +72,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const subdomain =
     subdomainRegistrar !== ethers.constants.AddressZero
       ? PLUGIN_REPO_ENS_SUBDOMAIN_NAME
-      : 'empty'; // todo set to empty when is possible
+      : '';
 
   const pluginRepoFactory = PluginRepoFactory__factory.connect(
     pluginRepoFactoryAddress,
@@ -104,7 +99,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 
   console.log(
-    `PluginRepo '${pluginEnsDomain(hre)}' deployed at '${pluginRepo.address}'.`
+    `PluginRepo ${
+      subdomainRegistrar !== ethers.constants.AddressZero
+    } ? '${pluginEnsDomain(hre)}' : ${''} deployed at '${pluginRepo.address}'.`
   );
 
   hre.aragonToVerifyContracts.push({
@@ -123,47 +120,35 @@ func.tags = ['CreateRepo'];
 func.skip = async (hre: HardhatRuntimeEnvironment) => {
   console.log(`\n🏗️  ${path.basename(__filename)}:`);
 
-  // Check if the ens record exists already
-  let pluginRepoAddress;
-  let ensDomain = '';
-  if (
-    !process.env.PLUGIN_REPO_ADDRESS ||
-    process.env.PLUGIN_REPO_ADDRESS === ethers.constants.AddressZero
-  ) {
-    // try getting the plugin repo from the ens
-    const res = await findPluginRepo(hre);
-    pluginRepoAddress = res.pluginRepo?.address;
-    ensDomain = res.ensDomain;
-  } else {
-    // use the provided plugin repo address
-    pluginRepoAddress = process.env.PLUGIN_REPO_ADDRESS;
-
-    console.log(
-      `Plugin Repo already deployed at '${pluginRepoAddress}' on network '${getProductionNetworkName(
-        hre
-      )}'. Skipping deployment...`
-    );
-    return true;
-  }
+  // try getting the plugin repo.
+  const res = await findPluginRepo(hre);
+  let pluginRepoAddress = res.pluginRepo?.address;
+  let ensDomain = res.ensDomain;
 
   if (pluginRepoAddress) {
-    console.log(
-      `ENS name '${ensDomain}' was claimed already at '${pluginRepoAddress}' on network '${getProductionNetworkName(
-        hre
-      )}'. Skipping deployment...`
-    );
+    if (ensDomain != '') {
+      console.log(
+        `ENS name '${ensDomain}' was claimed already at '${pluginRepoAddress}' on network '${getProductionNetworkName(
+          hre
+        )}'. Skipping deployment...`
+      );
+    } else {
+      console.log(
+        `Plugin Repo already deployed at '${pluginRepoAddress}' on network '${getProductionNetworkName(
+          hre
+        )}'. Skipping deployment...`
+      );
+    }
 
-    // todo if the plugin repo was already published should it be verified?
     hre.aragonToVerifyContracts.push({
       address: pluginRepoAddress,
       args: [],
     });
+
     return true;
-  } else {
-    // todo change this log
-    console.log(
-      `ENS name '${ensDomain}' is unclaimed. Deploying Plugin Repo...`
-    );
-    return false;
   }
+
+  console.log('Deploying Plugin Repo');
+
+  return false;
 };

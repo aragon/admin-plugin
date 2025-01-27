@@ -76,7 +76,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Get PluginRepo
   const {pluginRepo, ensDomain} = await findPluginRepo(hre);
   if (pluginRepo === null) {
-    throw `PluginRepo '${ensDomain}' does not exist yet.`;
+    throw `Can't find Plugin Repo...`;
   }
 
   // Check release number
@@ -140,26 +140,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       []
     )
   ) {
-    let placeholderSetup = getLatestContractAddress('PlaceholderSetup', hre);
-
-    if (placeholderSetup == '') {
-      // deploy placeholder setup
-      const {deploy} = deployments;
-      const res = await deploy(PLUGIN_SETUP_CONTRACT_NAME, {
-        from: deployer.address,
-        args: [],
-        log: true,
-      });
-
-      placeholderSetup = res.address;
-
-      // Queue the placeholder for verification
-      hre.aragonToVerifyContracts.push({
-        address: placeholderSetup,
-        args: [],
-      });
-    }
     if (latestBuild == 0 && VERSION.build > 1) {
+      // We are publishing the first version as build > 1.
+      // So we need to publish placeholders first..
+      let placeholderSetup =
+        process.env.PLACEHOLDER_SETUP ??
+        getLatestContractAddress('PlaceholderSetup', hre);
+
+      if (!ethers.utils.isAddress(placeholderSetup)) {
+        ('Aborting. Placeholder setup not present in this network or in .env or is not an address');
+      }
+
       for (let i = 0; i < VERSION.build - 1; i++) {
         console.log('Publishing placeholder', i + 1);
         await createVersion(
