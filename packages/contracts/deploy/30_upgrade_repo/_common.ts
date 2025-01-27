@@ -1,4 +1,8 @@
-import {findPluginRepo, getProductionNetworkName} from '../../utils/helpers';
+import {
+  findPluginRepo,
+  getProductionNetworkName,
+  isValidAddress,
+} from '../../utils/helpers';
 import {
   getLatestNetworkDeployment,
   getNetworkNameByAlias,
@@ -51,8 +55,10 @@ export async function fetchData(
   const pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
 
   if (pluginRepoFactoryAddress) {
-    if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
-      throw new Error('Plugin Repo Factory in .env is not of type Address');
+    if (!isValidAddress(pluginRepoFactoryAddress)) {
+      throw new Error(
+        'Plugin Repo Factory in .env is not a valid address (is not an address or is address zero)'
+      );
     }
 
     const pluginRepoFactory = PluginRepoFactory__factory.connect(

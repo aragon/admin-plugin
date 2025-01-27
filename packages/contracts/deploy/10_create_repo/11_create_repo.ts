@@ -3,6 +3,7 @@ import {
   findPluginRepo,
   getProductionNetworkName,
   pluginEnsDomain,
+  isValidAddress,
 } from '../../utils/helpers';
 import {
   getLatestNetworkDeployment,
@@ -41,7 +42,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let subdomainRegistrar;
 
   if (pluginRepoFactoryAddress) {
-    if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
+    if (!isValidAddress(pluginRepoFactoryAddress)) {
       throw new Error('Plugin Repo Factory in .env is not of type Address');
     }
     // use this factory

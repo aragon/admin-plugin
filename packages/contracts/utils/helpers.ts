@@ -73,8 +73,10 @@ export async function findPluginRepo(
   const [deployer] = await hre.ethers.getSigners();
 
   if (process.env.PLUGIN_REPO_ADDRESS) {
-    if (!ethers.utils.isAddress(process.env.PLUGIN_REPO_ADDRESS)) {
-      throw new Error('Plugin Repo in .env is not of type Address');
+    if (!isValidAddress(process.env.PLUGIN_REPO_ADDRESS)) {
+      throw new Error(
+        'Plugin Repo in .env is not a valid address (is not an address or is address zero)'
+      );
     }
 
     return {
@@ -90,8 +92,10 @@ export async function findPluginRepo(
   const pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
 
   if (pluginRepoFactoryAddress) {
-    if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
-      throw new Error('Plugin Repo Factory in .env is not of type Address');
+    if (!isValidAddress(pluginRepoFactoryAddress)) {
+      throw new Error(
+        'Plugin Repo Factory in .env is not valid address (is not an address or is address zero)'
+      );
     }
     // get ENS registrar from the plugin factory provided
     const pluginRepoFactory = PluginRepoFactory__factory.connect(
@@ -289,6 +293,14 @@ export async function createVersion(
     throw new Error('Failed to get VersionCreatedEvent event log');
   }
   return tx;
+}
+
+export function isValidAddress(address: string): boolean {
+  // check if the address is of type address and not zero address
+
+  return (
+    ethers.utils.isAddress(address) && address !== ethers.constants.AddressZero
+  );
 }
 
 export const AragonOSxAsciiArt =
