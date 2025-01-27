@@ -122,13 +122,12 @@ export async function findPluginRepo(
       networkDeployments.PluginENSSubdomainRegistrarProxy.address;
   }
 
-  let registrar;
   if (subdomainRegistrarAddress === ethers.constants.AddressZero) {
     // the network does not support ENS
     return {pluginRepo: null, ensDomain: ''};
   }
 
-  registrar = ENSSubdomainRegistrar__factory.connect(
+  const registrar = ENSSubdomainRegistrar__factory.connect(
     subdomainRegistrarAddress,
     deployer
   );
