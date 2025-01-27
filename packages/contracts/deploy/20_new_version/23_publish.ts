@@ -143,7 +143,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     if (latestBuild == 0 && VERSION.build > 1) {
       // We are publishing the first version as build > 1.
       // So we need to publish placeholders first..
-      let placeholderSetup =
+      const placeholderSetup =
         process.env.PLACEHOLDER_SETUP ??
         getLatestContractAddress('PlaceholderSetup', hre);
 

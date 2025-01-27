@@ -72,10 +72,11 @@ export async function findPluginRepo(
 ): Promise<{pluginRepo: PluginRepo | null; ensDomain: string}> {
   const [deployer] = await hre.ethers.getSigners();
 
-  if (
-    process.env.PLUGIN_REPO_ADDRESS &&
-    ethers.utils.isAddress(process.env.PLUGIN_REPO_ADDRESS)
-  ) {
+  if (process.env.PLUGIN_REPO_ADDRESS) {
+    if (!ethers.utils.isAddress(process.env.PLUGIN_REPO_ADDRESS)) {
+      throw new Error('Plugin Repo in .env is not of type Address');
+    }
+
     return {
       pluginRepo: PluginRepo__factory.connect(
         process.env.PLUGIN_REPO_ADDRESS,
@@ -86,7 +87,7 @@ export async function findPluginRepo(
   }
 
   let subdomainRegistrarAddress;
-  let pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
+  const pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
 
   if (pluginRepoFactoryAddress) {
     if (!ethers.utils.isAddress(pluginRepoFactoryAddress)) {
@@ -121,13 +122,12 @@ export async function findPluginRepo(
       networkDeployments.PluginENSSubdomainRegistrarProxy.address;
   }
 
-  let registrar;
   if (subdomainRegistrarAddress === ethers.constants.AddressZero) {
     // the network does not support ENS
     return {pluginRepo: null, ensDomain: ''};
   }
 
-  registrar = ENSSubdomainRegistrar__factory.connect(
+  const registrar = ENSSubdomainRegistrar__factory.connect(
     subdomainRegistrarAddress,
     deployer
   );
