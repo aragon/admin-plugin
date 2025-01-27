@@ -72,10 +72,11 @@ export async function findPluginRepo(
 ): Promise<{pluginRepo: PluginRepo | null; ensDomain: string}> {
   const [deployer] = await hre.ethers.getSigners();
 
-  if (
-    process.env.PLUGIN_REPO_ADDRESS &&
-    ethers.utils.isAddress(process.env.PLUGIN_REPO_ADDRESS)
-  ) {
+  if (process.env.PLUGIN_REPO_ADDRESS) {
+    if (!ethers.utils.isAddress(process.env.PLUGIN_REPO_ADDRESS)) {
+      throw new Error('Plugin Repo in .env is not of type Address');
+    }
+
     return {
       pluginRepo: PluginRepo__factory.connect(
         process.env.PLUGIN_REPO_ADDRESS,
