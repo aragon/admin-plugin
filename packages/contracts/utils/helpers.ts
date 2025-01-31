@@ -192,11 +192,6 @@ export async function getManagementDao(
     throw `Deployments are not available on network ${network}.`;
   }
 
-  console.log(
-    'NOT ENV VAR MANAGEMENT DAO ADDRESS',
-    networkDeployments.ManagementDAOProxy.address
-  );
-
   return DAO__factory.connect(
     networkDeployments.ManagementDAOProxy.address,
     deployer
