@@ -12,6 +12,7 @@ import {
   impersonatedManagementDaoSigner,
   isLocal,
   pluginEnsDomain,
+  isValidAddress,
 } from '../../utils/helpers';
 import {getLatestContractAddress} from '../helpers';
 import {PLUGIN_REPO_PERMISSIONS, uploadToPinata} from '@aragon/osx-commons-sdk';
@@ -38,6 +39,7 @@ async function createVersion(
       ethers.utils.hexlify(ethers.utils.toUtf8Bytes(buildMetadataURI)),
       ethers.utils.hexlify(ethers.utils.toUtf8Bytes(releaseMetadataURI))
     );
+
   await tx.wait();
 }
 
@@ -76,7 +78,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Get PluginRepo
   const {pluginRepo, ensDomain} = await findPluginRepo(hre);
   if (pluginRepo === null) {
-    throw `PluginRepo '${ensDomain}' does not exist yet.`;
+    throw `Can't find Plugin Repo...`;
   }
 
   // Check release number
@@ -140,13 +142,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       []
     )
   ) {
-    const placeholderSetup = getLatestContractAddress('PlaceholderSetup', hre);
-    if (placeholderSetup == '') {
-      throw new Error(
-        'Aborting. Placeholder setup not present in this network'
-      );
-    }
     if (latestBuild == 0 && VERSION.build > 1) {
+      // We are publishing the first version as build > 1.
+      // So we need to publish placeholders first..
+      const placeholderSetup =
+        process.env.PLACEHOLDER_SETUP ??
+        getLatestContractAddress('PlaceholderSetup', hre);
+
+      if (!isValidAddress(placeholderSetup)) {
+        throw new Error(
+          'Aborting. Placeholder setup not present in this network or in .env or is not a valid address (is not an address or is address zero)'
+        );
+      }
+
       for (let i = 0; i < VERSION.build - 1; i++) {
         console.log('Publishing placeholder', i + 1);
         await createVersion(
@@ -160,6 +168,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       }
     }
 
+    // Create the new version
     await createVersion(
       pluginRepo,
       VERSION.release,
