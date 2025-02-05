@@ -1,7 +1,5 @@
 = Admin
 
-WARNING: This documentation shows the *build 2* which uses *1.4 protocol version*. Currently, these are being audited. Even though, contracts are backwards compatible, we do *NOT* recommend using these latest versions in production until audit is finished.
-
 == Description
 
 **Admin** is a governance plugin developed and maintained by the Aragon core team. Unlike most governance plugins that store and manage proposals, **Admin** operates as a direct execution tool. While it supports the **IProposal** standard of Aragon OSx, it bypasses proposal storage entirely. Instead, users can create and immediately execute proposals in a single transaction.
