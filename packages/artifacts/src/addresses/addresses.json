@@ -1,0 +1,10 @@
+{
+    "network": {
+        "mainnet": {
+            "pluginRepo":""
+        },
+        "polygon": {
+            "pluginRepo":""
+        }
+    }
+}

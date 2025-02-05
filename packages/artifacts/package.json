@@ -1,0 +1,22 @@
+{
+  "name": "@aragon/admin-plugin-artifacts",
+  "author": "Aragon X",
+  "version": "1.4.0",
+  "license": "AGPL-3.0-or-later",
+  "description": "The Aragon OSx Solidity contracts ABIs",
+  "typings": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "generate": "bash generateAbis.sh"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

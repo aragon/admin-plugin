@@ -2,7 +2,7 @@
 .coverage_artifacts
 .coverage_cache
 .coverage_contracts
-artifacts
+packages/contracts/artifacts
 build
 cache
 coverage
@@ -37,3 +37,9 @@ artifacts-zk
 cache-zk
 deployments-zk
 deployments
+
+generated
+
+# artifacts
+temp_repo
+packages/artifacts/src/abis/abis.ts

@@ -5,6 +5,7 @@
     "type": "git",
     "url": "https://github.com/aragon/admin-plugin"
   },
+  "version": "1.3",
   "author": "Aragon",
   "license": "AGPL-3.0-or-later",
   "files": [
@@ -24,7 +25,8 @@
     "docgen": "hardhat docgen",
     "typechain": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat typechain",
     "clean": "rimraf ./artifacts ./cache ./coverage ./typechain ./coverage.json && yarn typechain",
-    "docs": "DOCS=true scripts/prepare-docs.sh"
+    "docs": "DOCS=true scripts/prepare-docs.sh",
+    "wagmi:generate":"wagmi generate"
   },
   "dependencies": {
     "@aragon/osx-commons-contracts": "^1.4.0",
@@ -76,6 +78,8 @@
     "tmp-promise": "^3.0.3",
     "ts-node": "^10.9.1",
     "typechain": "^8.3.2",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",    
+    "@wagmi/cli": "^2.2.0",
+    "@wagmi/core": "^2.16.3"
   }
 }
