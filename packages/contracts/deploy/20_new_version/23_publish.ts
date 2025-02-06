@@ -11,6 +11,7 @@ import {
   getPastVersionCreatedEvents,
   isLocal,
   pluginEnsDomain,
+  impersonatedManagementDaoSigner,
 } from '../../utils/helpers';
 import {getLatestContractAddress} from '../helpers';
 import {PLUGIN_REPO_PERMISSIONS, uploadToPinata} from '@aragon/osx-commons-sdk';
