@@ -1,6 +1,6 @@
 {
-  "name": "@aragon/admin-plugin",
   "private": true,
+  "version": "1.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/aragon/admin-plugin"
