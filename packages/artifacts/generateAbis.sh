@@ -4,12 +4,13 @@ set -e  # Exit on error
 
 # Define directories
 CONTRACTS_DIR="../contracts"
-GENERATED_ABIS="../contracts/generated/abis.ts"
+GENERATED_ABI_FILE="../contracts/generated/abis.ts"
 OUTPUT_ABIS_DIR="src/abis"
 
 # Move into contracts package and install dependencies
 cd $CONTRACTS_DIR
 
+# build contracts & generate abis
 yarn install
 
 yarn build
@@ -23,8 +24,8 @@ cd -
 mkdir -p "$OUTPUT_ABIS_DIR"
 
 # Copy the generated ABIs to the output directory
-if [ -f "$GENERATED_ABIS" ]; then
-    cp "$GENERATED_ABIS" "$OUTPUT_ABIS_DIR/abis.ts"
+if [ -f "$GENERATED_ABI_FILE" ]; then
+    cp "$GENERATED_ABI_FILE" "$OUTPUT_ABIS_DIR/abis.ts"
 else
     echo "Warning: generated/abis.ts not found."
 fi

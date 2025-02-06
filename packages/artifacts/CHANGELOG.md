@@ -1,4 +1,4 @@
-# Aragon OSx Commons Artifacts
+# Aragon Admin plugin Artifacts
 
 All notable changes to this project will be documented in this file.
 

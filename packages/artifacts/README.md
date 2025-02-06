@@ -1,31 +1,25 @@
-# Artifacts Package for Admin Plugin
+# Admin Plugin artifacts
 
-This package is responsible for generating and storing ABIs for smart contracts. It checks out the specified branch, compiles the contracts, and saves the ABIs in the `src/abis/` directory. The package can then be published to NPM for use in other projects.
+This package contains the ABIs of the OSx Admin plugin, as well as the address of the plugin repository on each network. 
 
 ## Installation
 
-Run the following command to install dependencies:
 ```sh
-yarn install
+yarn add @aragon/admin-plugin-artifacts
 ```
 
-## Usage
-###  Generate ABIs
-Run:
-```sh
-yarn generate
-```
-This will:
-1. Check out the `packages/contracts`.
-2. Install dependencies.
-3. Compile contracts using Hardhat.
-4. Generate ABIs using Wagmi.
-5. Save the ABIs in `src/abis/`.
+## Documentation
 
-## Publishing
+You can find all documentation regarding how to use this plugin in [Aragon's documentation here](https://docs.aragon.org/).
 
-To publish the package to NPM, run:
-```sh
-yarn publish --access public
-```
-Ensure the package version is updated in `package.json` before publishing.
+## Contributing
+
+If you like what we're doing and would love to support, please review our `CONTRIBUTING_GUIDE.md` [here](https://github.com/aragon/admin-plugin/blob/main/CONTRIBUTIONS.md). We'd love to build with you.
+
+## Security
+
+If you believe you've found a security issue, we encourage you to notify us. We welcome working with you to resolve the issue promptly.
+
+Security Contact Email: sirt@aragon.org
+
+Please do not use the issue tracker for security issues.
