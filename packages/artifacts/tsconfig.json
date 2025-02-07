@@ -2,10 +2,11 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
+    "declaration": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "declaration": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
   },
   "include": ["src"]
 }
+

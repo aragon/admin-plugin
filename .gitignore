@@ -40,6 +40,5 @@ deployments
 
 generated
 
-# artifacts
-temp_repo
-packages/artifacts/src/abis/abis.ts
+#artifacts
+packages/artifacts/src/abi.ts
