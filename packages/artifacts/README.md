@@ -21,6 +21,9 @@ import {
 import { addresses } from "@aragon/multisig-plugin-artifacts";
 ```
 
+You can also open [addresses.json](./src/addresses.json) directly.
+
+
 ## Development
 
 ### Building the package
@@ -37,8 +40,7 @@ The `build` script will:
 2. Install its dependencies.
 3. Compile the contracts using Hardhat.
 4. Generate their ABI.
-5. Extract their ABI into on `src/abi/*.json`.
-6. Generate a TypeScript file exporting each contract's ABI: `src/abi.ts`
+5. Extract their ABI and embed it into on `src/abi.ts`.
 
 ### Publish to NPM
 
@@ -56,7 +58,7 @@ yarn publish --access public
 
 ## Documentation
 
-You can find all documentation regarding how to use this plugin in [Aragon's documentation here](https://docs.aragon.org/).
+You can find all documentation regarding how to use this plugin in [Aragon's documentation here](https://docs.aragon.org/admin/1.x/index.html).
 
 ## Contributing
 

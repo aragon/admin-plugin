@@ -1,2 +1,3 @@
 export * from './abi';
-export { default as addresses } from './addresses.json';
+import * as addresses from "./addresses.json";
+export {addresses};
