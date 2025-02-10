@@ -12,13 +12,11 @@ yarn add @aragon/admin-plugin-artifacts
 
 ```typescript
 import {
-    MultisigABI,
-    IMultisigABI,
-    ListedCheckConditionABI,
-    MultisigSetupABI
-} from "@aragon/multisig-plugin-artifacts";
+    AdminSetupABI,
+    AdminABI
+} from "@aragon/admin-plugin-artifacts";
 
-import { addresses } from "@aragon/multisig-plugin-artifacts";
+import { addresses } from "@aragon/admin-plugin-artifacts";
 ```
 
 You can also open [addresses.json](./src/addresses.json) directly.
