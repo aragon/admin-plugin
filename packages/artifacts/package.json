@@ -3,7 +3,7 @@
   "author": "Aragon X",
   "version": "1.2.0",
   "license": "AGPL-3.0-or-later",
-  "description": "The Multisig Plugin ABI definition",
+  "description": "The Admin Plugin ABI definition",
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
   "files": [
