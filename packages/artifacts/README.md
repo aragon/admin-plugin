@@ -1,6 +1,6 @@
 # Admin Plugin artifacts
 
-This package contains the ABIs of the OSx Admin plugin, as well as the address of the plugin repository on each network. 
+This package contains the ABIs of the OSx Admin plugin, as well as the address of the plugin repository on each supported network. 
 
 ## Installation
 
