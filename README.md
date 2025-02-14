@@ -5,6 +5,16 @@
 [license]: https://opensource.org/licenses/AGPL-v3
 [license-badge]: https://img.shields.io/badge/License-AGPL_v3-blue.svg
 
+## Audit
+
+### v1.2.0
+
+**Halborn**: [audit report](https://github.com/aragon/osx/tree/main/audits/Halborn_AragonOSx_v1_4_Smart_Contract_Security_Assessment_Report_2025_01_03.pdf)
+
+- Commit ID: [546cfa243a5d0726d75158db646573ca2237f570](https://github.com/aragon/admin-plugin/commit/546cfa243a5d0726d75158db646573ca2237f570)
+- Started: 2024-11-18
+- Finished: 2025-02-13
+
 ## Project
 
 The root folder of the repo includes two subfolders:
