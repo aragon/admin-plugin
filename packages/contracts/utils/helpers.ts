@@ -105,10 +105,6 @@ export async function findPluginRepo(
   // from deployments
   const pluginRepo = await hre.deployments.getOrNull(PLUGIN_REPO_PROXY_NAME);
   if (pluginRepo) {
-    console.log(
-      'using the plugin repo from the deployments',
-      pluginRepo.address
-    );
     return {
       pluginRepo: PluginRepo__factory.connect(pluginRepo.address, deployer),
       ensDomain,
