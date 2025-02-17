@@ -91,7 +91,6 @@ export async function findPluginRepo(
       );
     }
 
-    console.log('from env var PLUGIN_REPO_ADDRESS');
     return {
       pluginRepo: PluginRepo__factory.connect(
         process.env.PLUGIN_REPO_ADDRESS,
@@ -104,8 +103,6 @@ export async function findPluginRepo(
   // from deployments
   const pluginRepo = await hre.deployments.getOrNull(PLUGIN_REPO_PROXY_NAME);
   if (pluginRepo) {
-    console.log('from deployments');
-
     return {
       pluginRepo: PluginRepo__factory.connect(pluginRepo.address, deployer),
       ensDomain,
@@ -180,11 +177,6 @@ export async function getPluginRepoFactory(
   const [deployer] = await hre.ethers.getSigners();
 
   const pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
-
-  console.log(
-    'pluginRepoFactoryAddress from env var PLUGIN_REPO_FACTORY_ADDRESS',
-    pluginRepoFactoryAddress
-  );
 
   // from env var
   if (!pluginRepoFactoryAddress || !isValidAddress(pluginRepoFactoryAddress)) {
