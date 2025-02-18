@@ -1,5 +1,5 @@
 name: admin
-title: Admin
+title: '@aragon/admin'
 version: 1.x
 prerelease: false
 nav:

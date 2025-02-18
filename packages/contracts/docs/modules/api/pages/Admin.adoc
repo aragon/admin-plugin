@@ -36,7 +36,7 @@
 
 [.contract]
 [[Admin]]
-=== `++Admin++` link:https://github.com/aragon/admin-plugin/blob/v1.3.0/packages/contracts/src/Admin.sol[{github-icon},role=heading-link]
+=== `++Admin++` link:https://github.com/aragon/admin-plugin/blob/v1.2/packages/contracts/src/Admin.sol[{github-icon},role=heading-link]
 
 v1.2 (Release 1, Build 2)
 
@@ -336,7 +336,7 @@ The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contra
 
 [.contract]
 [[AdminSetup]]
-=== `++AdminSetup++` link:https://github.com/aragon/admin-plugin/blob/v1.3.0/packages/contracts/src/AdminSetup.sol[{github-icon},role=heading-link]
+=== `++AdminSetup++` link:https://github.com/aragon/admin-plugin/blob/v1.2/packages/contracts/src/AdminSetup.sol[{github-icon},role=heading-link]
 
 v1.2 (Release 1, Build 2)
 
