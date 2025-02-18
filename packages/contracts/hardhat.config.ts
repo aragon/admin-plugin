@@ -88,7 +88,15 @@ function getHardhatNetworkAccountsConfig(
 }
 
 // Add the accounts specified in the `.env` file to the networks from osx-commons-configs
-const networks: {[index: string]: NetworkUserConfig} = osxCommonsConfigNetworks;
+const networks: {[index: string]: NetworkUserConfig} = {
+  ...osxCommonsConfigNetworks,
+  agungTestnet: {
+    url: 'https://wss-async.agung.peaq.network',
+    chainId: 9990,
+    gasPrice: 25000000000,
+    timeout: 60000,
+  },
+};
 for (const network of Object.keys(networks) as SupportedNetworks[]) {
   networks[network].accounts = specifiedAccounts();
 }
@@ -117,6 +125,10 @@ const config: HardhatUserConfig = {
   namedAccounts,
   networks: {
     hardhat: {
+      forking: {
+        url: 'https://mpfn1.peaq.network',
+        blockNumber: 3936303,
+      },
       throwOnTransactionFailures: true,
       throwOnCallFailures: true,
       blockGasLimit: BigNumber.from(10).pow(6).mul(30).toNumber(), // 30 million, really high to test some things that are only possible with a higher block gas limit
@@ -152,6 +164,22 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.basescan.org/api',
           browserURL: 'https://basescan.org',
+        },
+      },
+      {
+        network: 'agungTestnet', // Peaq testnet
+        chainId: 9990,
+        urls: {
+          apiURL: 'https://wss-async.agung.peaq.network',
+          browserURL: 'https://agung-testnet.subscan.io/',
+        },
+      },
+      {
+        network: 'peaq', // Peaq mainnet
+        chainId: 3338,
+        urls: {
+          apiURL: 'https://erpc-mpfn1.peaq.network',
+          browserURL: 'https://peaq.subscan.io/',
         },
       },
     ],

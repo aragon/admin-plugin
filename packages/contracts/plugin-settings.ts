@@ -9,7 +9,7 @@ export const PLUGIN_CONTRACT_NAME = 'Admin';
 export const PLUGIN_SETUP_CONTRACT_NAME = isZkSync(hre.network.name)
   ? 'AdminSetupZkSync'
   : 'AdminSetup';
-export const PLUGIN_REPO_ENS_SUBDOMAIN_NAME = 'admin'; // 'admin.plugin.dao.eth'
+export const PLUGIN_REPO_ENS_SUBDOMAIN_NAME = 'admin-test'; // 'admin.plugin.dao.eth'
 
 // Specify the version of your plugin that you are currently working on. The first version is v1.1.
 // For more details, visit https://devs.aragon.org/docs/osx/how-it-works/framework/plugin-management/plugin-repo.
