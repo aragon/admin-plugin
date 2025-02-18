@@ -1,7 +1,9 @@
-import {PLUGIN_REPO_ENS_SUBDOMAIN_NAME} from '../plugin-settings';
+import {
+  PLUGIN_REPO_ENS_SUBDOMAIN_NAME,
+  PLUGIN_REPO_PROXY_NAME,
+} from '../plugin-settings';
 import {
   SupportedNetworks,
-  getLatestNetworkDeployment,
   getNetworkNameByAlias,
   getPluginEnsDomain,
 } from '@aragon/osx-commons-configs';
@@ -10,6 +12,9 @@ import {
   DAO,
   DAO__factory,
   ENSSubdomainRegistrar__factory,
+  PluginRepoFactory,
+  PluginRepoFactory__factory,
+  PluginRepoRegistry__factory,
   ENS__factory,
   IAddrResolver__factory,
   PluginRepo,
@@ -65,29 +70,68 @@ export function pluginEnsDomain(hre: HardhatRuntimeEnvironment): string {
   return `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}.${pluginEnsDomain}`;
 }
 
+/**
+ * try to get the plugin repo first
+ * 1- env var PLUGIN_REPO_ADDRESS
+ * 2- try to get the latest network deployment
+ * 3- from the ens defined in the framework
+ *   - plugin repo factory address from env var
+ */
 export async function findPluginRepo(
   hre: HardhatRuntimeEnvironment
 ): Promise<{pluginRepo: PluginRepo | null; ensDomain: string}> {
   const [deployer] = await hre.ethers.getSigners();
-  const productionNetworkName: string = getProductionNetworkName(hre);
+  const ensDomain = pluginEnsDomain(hre);
 
-  const network = getNetworkNameByAlias(productionNetworkName);
-  if (network === null) {
-    throw new UnsupportedNetworkError(productionNetworkName);
+  // from env var
+  if (process.env.PLUGIN_REPO_ADDRESS) {
+    if (!isValidAddress(process.env.PLUGIN_REPO_ADDRESS)) {
+      throw new Error(
+        'Plugin Repo in .env is not a valid address (is not an address or is address zero)'
+      );
+    }
+
+    return {
+      pluginRepo: PluginRepo__factory.connect(
+        process.env.PLUGIN_REPO_ADDRESS,
+        deployer
+      ),
+      ensDomain,
+    };
   }
-  const networkDeployments = getLatestNetworkDeployment(network);
-  if (networkDeployments === null) {
-    throw `Deployments are not available on network ${network}.`;
+
+  // from deployments
+  const pluginRepo = await hre.deployments.getOrNull(PLUGIN_REPO_PROXY_NAME);
+  if (pluginRepo) {
+    return {
+      pluginRepo: PluginRepo__factory.connect(pluginRepo.address, deployer),
+      ensDomain,
+    };
+  }
+
+  // get ENS registrar from the plugin factory provided
+  const pluginRepoFactory = await getPluginRepoFactory(hre);
+
+  const pluginRepoRegistry = PluginRepoRegistry__factory.connect(
+    await pluginRepoFactory.pluginRepoRegistry(),
+    deployer
+  );
+
+  const subdomainRegistrarAddress =
+    await pluginRepoRegistry.subdomainRegistrar();
+
+  if (subdomainRegistrarAddress === ethers.constants.AddressZero) {
+    // the network does not support ENS and the plugin repo could not be found by env var or deployments
+    return {pluginRepo: null, ensDomain: ''};
   }
 
   const registrar = ENSSubdomainRegistrar__factory.connect(
-    networkDeployments.PluginENSSubdomainRegistrarProxy.address,
+    subdomainRegistrarAddress,
     deployer
   );
 
   // Check if the ens record exists already
   const ens = ENS__factory.connect(await registrar.ens(), deployer);
-  const ensDomain = pluginEnsDomain(hre);
   const node = ethers.utils.namehash(ensDomain);
   const recordExists = await ens.recordExists(node);
 
@@ -114,40 +158,34 @@ export async function getManagementDao(
   hre: HardhatRuntimeEnvironment
 ): Promise<DAO> {
   const [deployer] = await hre.ethers.getSigners();
-  const productionNetworkName = getProductionNetworkName(hre);
-  const network = getNetworkNameByAlias(productionNetworkName);
-  if (network === null) {
-    throw new UnsupportedNetworkError(productionNetworkName);
-  }
-  const networkDeployments = getLatestNetworkDeployment(network);
-  if (networkDeployments === null) {
-    throw `Deployments are not available on network ${network}.`;
+
+  const managementDaoAddress = process.env.MANAGEMENT_DAO_ADDRESS;
+
+  // getting the management DAO from the env var
+  if (!managementDaoAddress || !isValidAddress(managementDaoAddress)) {
+    throw new Error(
+      'Management DAO address in .env is not defined or is not a valid address (is not an address or is address zero)'
+    );
   }
 
-  return DAO__factory.connect(
-    networkDeployments.ManagementDAOProxy.address,
-    deployer
-  );
+  return DAO__factory.connect(managementDaoAddress, deployer);
 }
 
-export async function getManagementDaoMultisig(
+export async function getPluginRepoFactory(
   hre: HardhatRuntimeEnvironment
-): Promise<DAO> {
+): Promise<PluginRepoFactory> {
   const [deployer] = await hre.ethers.getSigners();
-  const productionNetworkName = getProductionNetworkName(hre);
-  const network = getNetworkNameByAlias(productionNetworkName);
-  if (network === null) {
-    throw new UnsupportedNetworkError(productionNetworkName);
-  }
-  const networkDeployments = getLatestNetworkDeployment(network);
-  if (networkDeployments === null) {
-    throw `Deployments are not available on network ${network}.`;
+
+  const pluginRepoFactoryAddress = process.env.PLUGIN_REPO_FACTORY_ADDRESS;
+
+  // from env var
+  if (!pluginRepoFactoryAddress || !isValidAddress(pluginRepoFactoryAddress)) {
+    throw new Error(
+      'Plugin Repo Factory address in .env is not defined or is not a valid address (is not an address or is address zero)'
+    );
   }
 
-  return DAO__factory.connect(
-    networkDeployments.ManagementDAOProxy.address,
-    deployer
-  );
+  return PluginRepoFactory__factory.connect(pluginRepoFactoryAddress, deployer);
 }
 
 export async function impersonatedManagementDaoSigner(
@@ -242,6 +280,26 @@ export async function createVersion(
     throw new Error('Failed to get VersionCreatedEvent event log');
   }
   return tx;
+}
+
+export function isValidAddress(address: string): boolean {
+  // check if the address is valid and not zero address
+  return (
+    ethers.utils.isAddress(address) && address !== ethers.constants.AddressZero
+  );
+}
+
+export async function frameworkSupportsENS(
+  pluginRepoFactory: PluginRepoFactory
+): Promise<boolean> {
+  const [deployer] = await ethers.getSigners();
+  const pluginRepoRegistry = PluginRepoRegistry__factory.connect(
+    await pluginRepoFactory.pluginRepoRegistry(),
+    deployer
+  );
+  const subdomainRegistrar = await pluginRepoRegistry.subdomainRegistrar();
+
+  return subdomainRegistrar !== ethers.constants.AddressZero;
 }
 
 export const AragonOSxAsciiArt =

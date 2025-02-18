@@ -1,7 +1,7 @@
 import {createDaoProxy} from '../20_integration-testing/test-helpers';
 import {PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
 import buildMetadata from '../../src/build-metadata.json';
-import {AdminSetup, Admin__factory, AdminSetup__factory} from '../../typechain';
+import {AdminSetup, Admin__factory} from '../../typechain';
 import {isZkSync} from '../../utils/zkSync';
 import {
   ADMIN_INTERFACE,

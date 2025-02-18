@@ -4,6 +4,7 @@ import {isZkSync} from './utils/zkSync';
 import {VersionTag} from '@aragon/osx-commons-sdk';
 import hre from 'hardhat';
 
+export const PLUGIN_REPO_PROXY_NAME = 'AdminRepoProxy';
 export const PLUGIN_CONTRACT_NAME = 'Admin';
 export const PLUGIN_SETUP_CONTRACT_NAME = isZkSync(hre.network.name)
   ? 'AdminSetupZkSync'

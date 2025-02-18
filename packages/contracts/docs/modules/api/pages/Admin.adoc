@@ -1,0 +1,465 @@
+:github-icon: pass:[<svg class="icon"><use href="#github-icon"/></svg>]
+:xref-Admin-initialize-contract-IDAO-struct-IPlugin-TargetConfig-: xref:Admin.adoc#Admin-initialize-contract-IDAO-struct-IPlugin-TargetConfig-
+:xref-Admin-supportsInterface-bytes4-: xref:Admin.adoc#Admin-supportsInterface-bytes4-
+:xref-Admin-isMember-address-: xref:Admin.adoc#Admin-isMember-address-
+:xref-Admin-customProposalParamsABI--: xref:Admin.adoc#Admin-customProposalParamsABI--
+:xref-Admin-createProposal-bytes-struct-Action---uint64-uint64-bytes-: xref:Admin.adoc#Admin-createProposal-bytes-struct-Action---uint64-uint64-bytes-
+:xref-Admin-hasSucceeded-uint256-: xref:Admin.adoc#Admin-hasSucceeded-uint256-
+:xref-Admin-canExecute-uint256-: xref:Admin.adoc#Admin-canExecute-uint256-
+:xref-Admin-execute-uint256-: xref:Admin.adoc#Admin-execute-uint256-
+:xref-Admin-executeProposal-bytes-struct-Action---uint256-: xref:Admin.adoc#Admin-executeProposal-bytes-struct-Action---uint256-
+:xref-Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32: xref:Admin.adoc#Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32
+:xref-Admin-FunctionNotSupported--: xref:Admin.adoc#Admin-FunctionNotSupported--
+:xref-Admin-ADMIN_INTERFACE_ID-bytes4: xref:Admin.adoc#Admin-ADMIN_INTERFACE_ID-bytes4
+:xref-AdminSetup-constructor--: xref:Admin.adoc#AdminSetup-constructor--
+:xref-AdminSetup-prepareInstallation-address-bytes-: xref:Admin.adoc#AdminSetup-prepareInstallation-address-bytes-
+:xref-AdminSetup-prepareUninstallation-address-struct-IPluginSetup-SetupPayload-: xref:Admin.adoc#AdminSetup-prepareUninstallation-address-struct-IPluginSetup-SetupPayload-
+:xref-AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32
+:xref-AdminSetup-AdminAddressInvalid-address-: xref:Admin.adoc#AdminSetup-AdminAddressInvalid-address-
+:xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32: xref:Admin.adoc#AdminSetup-EXECUTE_PERMISSION_ID-bytes32
+= Admin API
+
+== Core
+
+:ADMIN_INTERFACE_ID: pass:normal[xref:#Admin-ADMIN_INTERFACE_ID-bytes4[`++ADMIN_INTERFACE_ID++`]]
+:EXECUTE_PROPOSAL_PERMISSION_ID: pass:normal[xref:#Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32[`++EXECUTE_PROPOSAL_PERMISSION_ID++`]]
+:FunctionNotSupported: pass:normal[xref:#Admin-FunctionNotSupported--[`++FunctionNotSupported++`]]
+:initialize: pass:normal[xref:#Admin-initialize-contract-IDAO-struct-IPlugin-TargetConfig-[`++initialize++`]]
+:supportsInterface: pass:normal[xref:#Admin-supportsInterface-bytes4-[`++supportsInterface++`]]
+:isMember: pass:normal[xref:#Admin-isMember-address-[`++isMember++`]]
+:customProposalParamsABI: pass:normal[xref:#Admin-customProposalParamsABI--[`++customProposalParamsABI++`]]
+:createProposal: pass:normal[xref:#Admin-createProposal-bytes-struct-Action---uint64-uint64-bytes-[`++createProposal++`]]
+:hasSucceeded: pass:normal[xref:#Admin-hasSucceeded-uint256-[`++hasSucceeded++`]]
+:canExecute: pass:normal[xref:#Admin-canExecute-uint256-[`++canExecute++`]]
+:execute: pass:normal[xref:#Admin-execute-uint256-[`++execute++`]]
+:executeProposal: pass:normal[xref:#Admin-executeProposal-bytes-struct-Action---uint256-[`++executeProposal++`]]
+
+[.contract]
+[[Admin]]
+=== `++Admin++` link:https://github.com/aragon/admin-plugin/blob/v1.2/packages/contracts/src/Admin.sol[{github-icon},role=heading-link]
+
+v1.2 (Release 1, Build 2)
+
+[.contract-index]
+.Functions
+--
+* {xref-Admin-initialize-contract-IDAO-struct-IPlugin-TargetConfig-}[`++initialize(_dao, _targetConfig)++`]
+* {xref-Admin-supportsInterface-bytes4-}[`++supportsInterface(_interfaceId)++`]
+* {xref-Admin-isMember-address-}[`++isMember(_account)++`]
+* {xref-Admin-customProposalParamsABI--}[`++customProposalParamsABI()++`]
+* {xref-Admin-createProposal-bytes-struct-Action---uint64-uint64-bytes-}[`++createProposal(_metadata, _actions, , , _data)++`]
+* {xref-Admin-hasSucceeded-uint256-}[`++hasSucceeded()++`]
+* {xref-Admin-canExecute-uint256-}[`++canExecute()++`]
+* {xref-Admin-execute-uint256-}[`++execute()++`]
+* {xref-Admin-executeProposal-bytes-struct-Action---uint256-}[`++executeProposal(_metadata, _actions, _allowFailureMap)++`]
+* {xref-Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32}[`++EXECUTE_PROPOSAL_PERMISSION_ID()++`]
+
+[.contract-subindex-inherited]
+.ProposalUpgradeable
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol[proposalCount]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol[_createProposalId]
+
+[.contract-subindex-inherited]
+.PluginCloneable
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[__PluginCloneable_init]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[setTargetConfig]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[pluginType]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[getCurrentTargetConfig]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[getTargetConfig]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[_setTargetConfig]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[_execute]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[_execute]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[SET_TARGET_CONFIG_PERMISSION_ID]
+
+[.contract-subindex-inherited]
+.ProtocolVersion
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/utils/versioning/ProtocolVersion.sol[protocolVersion]
+
+[.contract-subindex-inherited]
+.IProtocolVersion
+
+[.contract-subindex-inherited]
+.DaoAuthorizableUpgradeable
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/permission/auth/DaoAuthorizableUpgradeable.sol[__DaoAuthorizableUpgradeable_init]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/permission/auth/DaoAuthorizableUpgradeable.sol[dao]
+
+[.contract-subindex-inherited]
+.ContextUpgradeable
+
+[.contract-subindex-inherited]
+.ERC165Upgradeable
+
+[.contract-subindex-inherited]
+.IERC165Upgradeable
+
+[.contract-subindex-inherited]
+.Initializable
+
+[.contract-subindex-inherited]
+.IProposal
+
+[.contract-subindex-inherited]
+.IPlugin
+
+[.contract-subindex-inherited]
+.IMembership
+
+--
+
+[.contract-index]
+.Events
+--
+
+[.contract-subindex-inherited]
+.ProposalUpgradeable
+
+[.contract-subindex-inherited]
+.PluginCloneable
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[TargetSet]
+
+[.contract-subindex-inherited]
+.ProtocolVersion
+
+[.contract-subindex-inherited]
+.IProtocolVersion
+
+[.contract-subindex-inherited]
+.DaoAuthorizableUpgradeable
+
+[.contract-subindex-inherited]
+.ContextUpgradeable
+
+[.contract-subindex-inherited]
+.ERC165Upgradeable
+
+[.contract-subindex-inherited]
+.IERC165Upgradeable
+
+[.contract-subindex-inherited]
+.Initializable
+
+[.contract-subindex-inherited]
+.IProposal
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/proposal/IProposal.sol[ProposalCreated]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/proposal/IProposal.sol[ProposalExecuted]
+
+[.contract-subindex-inherited]
+.IPlugin
+
+[.contract-subindex-inherited]
+.IMembership
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/membership/IMembership.sol[MembersAdded]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/membership/IMembership.sol[MembersRemoved]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/membership/IMembership.sol[MembershipContractAnnounced]
+
+--
+
+[.contract-index]
+.Errors
+--
+* {xref-Admin-FunctionNotSupported--}[`++FunctionNotSupported()++`]
+
+[.contract-subindex-inherited]
+.ProposalUpgradeable
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/extensions/proposal/ProposalUpgradeable.sol[FunctionDeprecated]
+
+[.contract-subindex-inherited]
+.PluginCloneable
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[InvalidTargetConfig]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/PluginCloneable.sol[DelegateCallFailed]
+
+[.contract-subindex-inherited]
+.ProtocolVersion
+
+[.contract-subindex-inherited]
+.IProtocolVersion
+
+[.contract-subindex-inherited]
+.DaoAuthorizableUpgradeable
+
+[.contract-subindex-inherited]
+.ContextUpgradeable
+
+[.contract-subindex-inherited]
+.ERC165Upgradeable
+
+[.contract-subindex-inherited]
+.IERC165Upgradeable
+
+[.contract-subindex-inherited]
+.Initializable
+
+[.contract-subindex-inherited]
+.IProposal
+
+[.contract-subindex-inherited]
+.IPlugin
+
+[.contract-subindex-inherited]
+.IMembership
+
+--
+
+[.contract-index]
+.Internal Variables
+--
+* {xref-Admin-ADMIN_INTERFACE_ID-bytes4}[`++bytes4 constant ADMIN_INTERFACE_ID++`]
+
+[.contract-subindex-inherited]
+.ProposalUpgradeable
+
+[.contract-subindex-inherited]
+.PluginCloneable
+
+[.contract-subindex-inherited]
+.ProtocolVersion
+
+[.contract-subindex-inherited]
+.IProtocolVersion
+
+[.contract-subindex-inherited]
+.DaoAuthorizableUpgradeable
+
+[.contract-subindex-inherited]
+.ContextUpgradeable
+
+[.contract-subindex-inherited]
+.ERC165Upgradeable
+
+[.contract-subindex-inherited]
+.IERC165Upgradeable
+
+[.contract-subindex-inherited]
+.Initializable
+
+[.contract-subindex-inherited]
+.IProposal
+
+[.contract-subindex-inherited]
+.IPlugin
+
+[.contract-subindex-inherited]
+.IMembership
+
+--
+
+[.contract-item]
+[[Admin-initialize-contract-IDAO-struct-IPlugin-TargetConfig-]]
+==== `[.contract-item-name]#++initialize++#++(contract IDAO _dao, struct IPlugin.TargetConfig _targetConfig)++` [.item-kind]#external#
+
+Initializes the contract.
+
+This method is required to support [ERC-1167](https://eips.ethereum.org/EIPS/eip-1167).
+
+[.contract-item]
+[[Admin-supportsInterface-bytes4-]]
+==== `[.contract-item-name]#++supportsInterface++#++(bytes4 _interfaceId) → bool++` [.item-kind]#public#
+
+Checks if this or the parent contract supports an interface by its ID.
+
+[.contract-item]
+[[Admin-isMember-address-]]
+==== `[.contract-item-name]#++isMember++#++(address _account) → bool++` [.item-kind]#external#
+
+Checks if an account is a member of the DAO.
+
+This function must be implemented in the plugin contract that introduces the members to the DAO.
+
+[.contract-item]
+[[Admin-customProposalParamsABI--]]
+==== `[.contract-item-name]#++customProposalParamsABI++#++() → string++` [.item-kind]#external#
+
+The human-readable abi format for extra params included in `data` of `createProposal`.
+
+Used for UI to easily detect what extra params the contract expects.
+
+[.contract-item]
+[[Admin-createProposal-bytes-struct-Action---uint64-uint64-bytes-]]
+==== `[.contract-item-name]#++createProposal++#++(bytes _metadata, struct Action[] _actions, uint64, uint64, bytes _data) → uint256 proposalId++` [.item-kind]#public#
+
+Creates a new proposal.
+
+[.contract-item]
+[[Admin-hasSucceeded-uint256-]]
+==== `[.contract-item-name]#++hasSucceeded++#++(uint256) → bool++` [.item-kind]#public#
+
+Whether proposal succeeded or not.
+
+Note that this must not include time window checks and only make a decision based on the thresholds.
+
+[.contract-item]
+[[Admin-canExecute-uint256-]]
+==== `[.contract-item-name]#++canExecute++#++(uint256) → bool++` [.item-kind]#public#
+
+Checks if a proposal can be executed.
+
+[.contract-item]
+[[Admin-execute-uint256-]]
+==== `[.contract-item-name]#++execute++#++(uint256)++` [.item-kind]#public#
+
+Executes a proposal.
+
+Note that this function will always revert since this contract doesn't store
+     proposals and only executes the actions at run-time. This function is still
+     necessary to allow compiling the contract as `Admin` inherits from `IProposal`.
+
+[.contract-item]
+[[Admin-executeProposal-bytes-struct-Action---uint256-]]
+==== `[.contract-item-name]#++executeProposal++#++(bytes _metadata, struct Action[] _actions, uint256 _allowFailureMap) → uint256 proposalId++` [.item-kind]#public#
+
+Creates and executes a new proposal.
+
+[.contract-item]
+[[Admin-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32]]
+==== `[.contract-item-name]#++EXECUTE_PROPOSAL_PERMISSION_ID++#++() → bytes32++` [.item-kind]#public#
+
+The ID of the permission required to call the `executeProposal` function.
+
+[.contract-item]
+[[Admin-FunctionNotSupported--]]
+==== `[.contract-item-name]#++FunctionNotSupported++#++()++` [.item-kind]#error#
+
+Thrown if the `execute` function is called.
+
+[.contract-item]
+[[Admin-ADMIN_INTERFACE_ID-bytes4]]
+==== `bytes4 [.contract-item-name]#++ADMIN_INTERFACE_ID++#` [.item-kind]#internal constant#
+
+The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
+
+:EXECUTE_PERMISSION_ID: pass:normal[xref:#AdminSetup-EXECUTE_PERMISSION_ID-bytes32[`++EXECUTE_PERMISSION_ID++`]]
+:EXECUTE_PROPOSAL_PERMISSION_ID: pass:normal[xref:#AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32[`++EXECUTE_PROPOSAL_PERMISSION_ID++`]]
+:AdminAddressInvalid: pass:normal[xref:#AdminSetup-AdminAddressInvalid-address-[`++AdminAddressInvalid++`]]
+:constructor: pass:normal[xref:#AdminSetup-constructor--[`++constructor++`]]
+:prepareInstallation: pass:normal[xref:#AdminSetup-prepareInstallation-address-bytes-[`++prepareInstallation++`]]
+:prepareUninstallation: pass:normal[xref:#AdminSetup-prepareUninstallation-address-struct-IPluginSetup-SetupPayload-[`++prepareUninstallation++`]]
+
+[.contract]
+[[AdminSetup]]
+=== `++AdminSetup++` link:https://github.com/aragon/admin-plugin/blob/v1.2/packages/contracts/src/AdminSetup.sol[{github-icon},role=heading-link]
+
+v1.2 (Release 1, Build 2)
+
+[.contract-index]
+.Functions
+--
+* {xref-AdminSetup-constructor--}[`++constructor()++`]
+* {xref-AdminSetup-prepareInstallation-address-bytes-}[`++prepareInstallation(_dao, _data)++`]
+* {xref-AdminSetup-prepareUninstallation-address-struct-IPluginSetup-SetupPayload-}[`++prepareUninstallation(_dao, _payload)++`]
+* {xref-AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32}[`++EXECUTE_PROPOSAL_PERMISSION_ID()++`]
+
+[.contract-subindex-inherited]
+.PluginSetup
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/setup/PluginSetup.sol[prepareUpdate]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/setup/PluginSetup.sol[supportsInterface]
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/setup/PluginSetup.sol[implementation]
+
+[.contract-subindex-inherited]
+.ProtocolVersion
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/utils/versioning/ProtocolVersion.sol[protocolVersion]
+
+[.contract-subindex-inherited]
+.IProtocolVersion
+
+[.contract-subindex-inherited]
+.IPluginSetup
+
+[.contract-subindex-inherited]
+.ERC165
+
+[.contract-subindex-inherited]
+.IERC165
+
+--
+
+[.contract-index]
+.Errors
+--
+* {xref-AdminSetup-AdminAddressInvalid-address-}[`++AdminAddressInvalid(admin)++`]
+
+[.contract-subindex-inherited]
+.PluginSetup
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/setup/PluginSetup.sol[NonUpgradeablePlugin]
+
+[.contract-subindex-inherited]
+.ProtocolVersion
+
+[.contract-subindex-inherited]
+.IProtocolVersion
+
+[.contract-subindex-inherited]
+.IPluginSetup
+
+[.contract-subindex-inherited]
+.ERC165
+
+[.contract-subindex-inherited]
+.IERC165
+
+--
+
+[.contract-index]
+.Internal Variables
+--
+* {xref-AdminSetup-EXECUTE_PERMISSION_ID-bytes32}[`++bytes32 constant EXECUTE_PERMISSION_ID++`]
+
+[.contract-subindex-inherited]
+.PluginSetup
+* link:https://github.com/aragon/osx-commons/tree/main/contracts/src/plugin/setup/PluginSetup.sol[IMPLEMENTATION]
+
+[.contract-subindex-inherited]
+.ProtocolVersion
+
+[.contract-subindex-inherited]
+.IProtocolVersion
+
+[.contract-subindex-inherited]
+.IPluginSetup
+
+[.contract-subindex-inherited]
+.ERC165
+
+[.contract-subindex-inherited]
+.IERC165
+
+--
+
+[.contract-item]
+[[AdminSetup-constructor--]]
+==== `[.contract-item-name]#++constructor++#++()++` [.item-kind]#public#
+
+The constructor setting the `Admin` implementation contract to clone from.
+
+[.contract-item]
+[[AdminSetup-prepareInstallation-address-bytes-]]
+==== `[.contract-item-name]#++prepareInstallation++#++(address _dao, bytes _data) → address plugin, struct IPluginSetup.PreparedSetupData preparedSetupData++` [.item-kind]#external#
+
+Prepares the installation of a plugin.
+
+[.contract-item]
+[[AdminSetup-prepareUninstallation-address-struct-IPluginSetup-SetupPayload-]]
+==== `[.contract-item-name]#++prepareUninstallation++#++(address _dao, struct IPluginSetup.SetupPayload _payload) → struct PermissionLib.MultiTargetPermission[] permissions++` [.item-kind]#external#
+
+Prepares the uninstallation of a plugin.
+
+Currently, there is no reliable way to revoke the `ADMIN_EXECUTE_PERMISSION_ID` from all addresses
+    it has been granted to. Accordingly, only the `EXECUTE_PERMISSION_ID` is revoked for this uninstallation.
+
+[.contract-item]
+[[AdminSetup-EXECUTE_PROPOSAL_PERMISSION_ID-bytes32]]
+==== `[.contract-item-name]#++EXECUTE_PROPOSAL_PERMISSION_ID++#++() → bytes32++` [.item-kind]#public#
+
+The ID of the permission required to call the `executeProposal` function.
+
+[.contract-item]
+[[AdminSetup-AdminAddressInvalid-address-]]
+==== `[.contract-item-name]#++AdminAddressInvalid++#++(address admin)++` [.item-kind]#error#
+
+Thrown if the admin address is zero.
+
+[.contract-item]
+[[AdminSetup-EXECUTE_PERMISSION_ID-bytes32]]
+==== `bytes32 [.contract-item-name]#++EXECUTE_PERMISSION_ID++#` [.item-kind]#internal constant#
+
+The ID of the permission required to call the `execute` function.
+

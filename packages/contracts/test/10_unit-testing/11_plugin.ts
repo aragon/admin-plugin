@@ -3,17 +3,15 @@ import {PLUGIN_CONTRACT_NAME} from '../../plugin-settings';
 import {
   Admin,
   Admin__factory,
-  AdminZkSync__factory,
   CustomExecutorMock__factory,
   IERC165Upgradeable__factory,
   IMembership__factory,
   IPlugin__factory,
   IProposal__factory,
   IProtocolVersion__factory,
-  ProxyFactory__factory,
 } from '../../typechain';
 import {ProposalCreatedEvent} from '../../typechain/src/Admin';
-import {isZkSync, ZK_SYNC_NETWORKS} from '../../utils/zkSync';
+import {isZkSync} from '../../utils/zkSync';
 import {
   ADMIN_INTERFACE,
   EXECUTE_PROPOSAL_PERMISSION_ID,
