@@ -148,6 +148,8 @@ const config: HardhatUserConfig = {
       polygon: process.env.POLYGONSCAN_API_KEY || '',
       base: process.env.BASESCAN_API_KEY || '',
       arbitrumOne: process.env.ARBISCAN_API_KEY || '',
+      peaq: process.env.PEAQ_KEY || '',
+      agungTestnet: process.env.PEAQ_KEY || '',
     },
     customChains: [
       {
@@ -170,7 +172,8 @@ const config: HardhatUserConfig = {
         network: 'agungTestnet', // Peaq testnet
         chainId: 9990,
         urls: {
-          apiURL: 'https://wss-async.agung.peaq.network',
+          apiURL:
+            'https://agung-testnet.subscan.io/api/scan/evm/contract/verify',
           browserURL: 'https://agung-testnet.subscan.io/',
         },
       },
@@ -178,7 +181,7 @@ const config: HardhatUserConfig = {
         network: 'peaq', // Peaq mainnet
         chainId: 3338,
         urls: {
-          apiURL: 'https://erpc-mpfn1.peaq.network',
+          apiURL: '',
           browserURL: 'https://peaq.subscan.io/',
         },
       },
