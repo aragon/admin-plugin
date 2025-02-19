@@ -9,12 +9,13 @@ import {PluginRepo} from '../../typechain';
 import {
   findPluginRepo,
   getPastVersionCreatedEvents,
-  impersonatedManagementDaoSigner,
   isLocal,
   pluginEnsDomain,
+  impersonatedManagementDaoSigner,
   isValidAddress,
 } from '../../utils/helpers';
 import {PLUGIN_REPO_PERMISSIONS, uploadToPinata} from '@aragon/osx-commons-sdk';
+import {PluginRepo__factory} from '@aragon/osx-ethers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {writeFile} from 'fs/promises';
 import {ethers} from 'hardhat';
@@ -193,6 +194,26 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   } else {
     // The deployer does not have `MAINTAINER_PERMISSION_ID` permission and we are not deploying to a production network,
     // so we write the data into a file for a management DAO member to create a proposal from it.
+
+    const pluginRepoInterface = PluginRepo__factory.createInterface();
+    const versionData = {
+      _release: VERSION.release,
+      _pluginSetup: setup.address,
+      _buildMetadata: ethers.utils.hexlify(
+        ethers.utils.toUtf8Bytes(buildMetadataURI)
+      ),
+      _releaseMetadata: ethers.utils.hexlify(
+        ethers.utils.toUtf8Bytes(releaseMetadataURI)
+      ),
+    };
+
+    const calldata = pluginRepoInterface.encodeFunctionData('createVersion', [
+      versionData._release,
+      versionData._pluginSetup,
+      versionData._buildMetadata,
+      versionData._releaseMetadata,
+    ]);
+
     const data = {
       proposalTitle: `Publish '${PLUGIN_CONTRACT_NAME}' plugin v${VERSION.release}.${VERSION.build}`,
       proposalSummary: `Publishes v${VERSION.release}.${VERSION.build} of the '${PLUGIN_CONTRACT_NAME}' plugin in the '${ensDomain}' plugin repo.`,
@@ -202,16 +223,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       actions: [
         {
           to: pluginRepo.address,
-          createVersion: {
-            _release: VERSION.release,
-            _pluginSetup: setup.address,
-            _buildMetadata: ethers.utils.hexlify(
-              ethers.utils.toUtf8Bytes(buildMetadataURI)
-            ),
-            _releaseMetadata: ethers.utils.hexlify(
-              ethers.utils.toUtf8Bytes(releaseMetadataURI)
-            ),
-          },
+          value: 0,
+          data: calldata,
+          createVersion: versionData,
         },
       ],
     };
