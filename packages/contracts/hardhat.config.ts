@@ -94,7 +94,10 @@ const networks: {[index: string]: NetworkUserConfig} = {
     url: 'https://wss-async.agung.peaq.network',
     chainId: 9990,
     gasPrice: 25000000000,
-    timeout: 60000,
+  },
+  peaq: {
+    url: 'https://erpc-mpfn1.peaq.network',
+    chainId: 3338,
   },
 };
 for (const network of Object.keys(networks) as SupportedNetworks[]) {
