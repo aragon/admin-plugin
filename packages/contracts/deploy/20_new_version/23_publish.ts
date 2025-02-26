@@ -271,7 +271,7 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
       return true;
     }
   } catch (error) {
-    console.log(`Error in geting previouse version ${error}.`);
+    console.log(`Error in getting the previous version ${error}.`);
   }
 
   return false;
