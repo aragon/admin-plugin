@@ -5,8 +5,8 @@ import {
   SupportedNetworks,
 } from '@aragon/osx-commons-configs';
 import '@nomicfoundation/hardhat-chai-matchers';
-import '@nomicfoundation/hardhat-toolbox';
-import '@nomiclabs/hardhat-etherscan';
+import '@nomicfoundation/hardhat-network-helpers';
+import '@nomicfoundation/hardhat-verify';
 import '@openzeppelin/hardhat-upgrades';
 import '@typechain/hardhat';
 import {config as dotenvConfig} from 'dotenv';
@@ -151,8 +151,7 @@ const config: HardhatUserConfig = {
       polygon: process.env.POLYGONSCAN_API_KEY || '',
       base: process.env.BASESCAN_API_KEY || '',
       arbitrumOne: process.env.ARBISCAN_API_KEY || '',
-      peaq: process.env.PEAQ_KEY || '',
-      agungTestnet: process.env.PEAQ_KEY || '',
+      peaq: '1',
     },
     customChains: [
       {
@@ -176,7 +175,7 @@ const config: HardhatUserConfig = {
         chainId: 9990,
         urls: {
           apiURL:
-            'https://agung-testnet.subscan.io/api/scan/evm/contract/verify',
+            'https://agung-testnet.subscan.io/api',
           browserURL: 'https://agung-testnet.subscan.io/',
         },
       },
@@ -184,7 +183,7 @@ const config: HardhatUserConfig = {
         network: 'peaq', // Peaq mainnet
         chainId: 3338,
         urls: {
-          apiURL: '',
+          apiURL: 'https://peaq.api.subscan.io/api',
           browserURL: 'https://peaq.subscan.io/',
         },
       },
