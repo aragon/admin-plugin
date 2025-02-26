@@ -171,7 +171,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        network: 'peaq', // Peaq mainnet
+        network: 'peaq',
         chainId: 3338,
         urls: {
           apiURL:
