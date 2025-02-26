@@ -174,8 +174,7 @@ const config: HardhatUserConfig = {
         network: 'agungTestnet', // Peaq testnet
         chainId: 9990,
         urls: {
-          apiURL:
-            'https://agung-testnet.subscan.io/api',
+          apiURL: 'https://agung-testnet.subscan.io/api',
           browserURL: 'https://agung-testnet.subscan.io/',
         },
       },
