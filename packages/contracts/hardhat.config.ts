@@ -171,18 +171,11 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        network: 'agungTestnet', // Peaq testnet
-        chainId: 9990,
-        urls: {
-          apiURL: 'https://agung-testnet.subscan.io/api',
-          browserURL: 'https://agung-testnet.subscan.io/',
-        },
-      },
-      {
         network: 'peaq', // Peaq mainnet
         chainId: 3338,
         urls: {
-          apiURL: 'https://peaq.api.subscan.io/api',
+          apiURL:
+            'https://peaq.api.subscan.io/api/scan/evm/contract/verifysource',
           browserURL: 'https://peaq.subscan.io/',
         },
       },
