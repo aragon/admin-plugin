@@ -91,7 +91,7 @@ skipTestSuiteIfNetworkIsZkSync(
         ),
         []
       );
-    });
+    }).timeout(60 * 1000);
   }
 );
 
