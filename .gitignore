@@ -19,3 +19,13 @@ coverage.json
 
 packages/contracts/createVersionProposalData*.json
 packages/contracts/upgradeRepoProposalData*.json
+
+artifacts-zk
+cache-zk
+deployments-zk
+deployments
+
+generated
+
+#artifacts
+packages/artifacts/src/abi.ts

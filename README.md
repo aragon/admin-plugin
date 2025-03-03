@@ -17,10 +17,17 @@
 
 ## Project
 
-The root folder of the repo includes one subfolders:
+The root folder of the repo includes two subfolders:
 
 ```markdown
 .
+├── packages/artifacts
+│ ├── src
+│ ├── prepare-abi.sh
+│ ├── README.md
+│ ├── ...
+| └── package.json
+|
 ├── packages/contracts
 │ ├── src
 │ ├── deploy
