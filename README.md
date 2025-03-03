@@ -237,22 +237,6 @@ yarn deploy:zksync --network zksyncSepolia --tags ...
 yarn deploy:zksync --network zksyncMainnet --tags ...
 ```
 
-### Linting
-
-Lint the TypeScript code with
-
-```sh
-yarn lint
-```
-
-### Coverage
-
-Generate the code coverage with
-
-```sh
-yarn coverage
-```
-
 ## License
 
 This project is licensed under AGPL-3.0-or-later.
