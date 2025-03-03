@@ -5,6 +5,16 @@
 [license]: https://opensource.org/licenses/AGPL-v3
 [license-badge]: https://img.shields.io/badge/License-AGPL_v3-blue.svg
 
+## Audit
+
+### v1.2.0
+
+**Halborn**: [audit report](https://github.com/aragon/osx/tree/main/audits/Halborn_AragonOSx_v1_4_Smart_Contract_Security_Assessment_Report_2025_01_03.pdf)
+
+- Commit ID: [546cfa243a5d0726d75158db646573ca2237f570](https://github.com/aragon/admin-plugin/commit/546cfa243a5d0726d75158db646573ca2237f570)
+- Started: 2024-11-18
+- Finished: 2025-02-13
+
 ## Project
 
 The root folder of the repo includes one subfolders:
@@ -26,7 +36,7 @@ The root folder of the repo includes one subfolders:
 The root-level `package.json` file contains global `dev-dependencies` for formatting and linting. After installing the dependencies with
 
 ```sh
-yarn install
+yarn --ignore-scripts
 ```
 
 you can run the associated [formatting](#formatting) and [linting](#linting) commands.
@@ -66,41 +76,40 @@ Before deploying, you MUST also change the default hardhat private key (`PRIVATE
 
 ## Contracts
 
-In `packages/contracts`, first run
+This package is located in `packages/contracts`.
+
+### Install Dependencies
 
 ```sh
-yarn install
+yarn --ignore-scripts
 ```
 
 ### Building
 
-First build the contracts and
+To build the contracts on EVM based networks:
 
 ```sh
 yarn build
 ```
 
-and generate the [typechain TypeScript bindings](https://github.com/dethcrypto/TypeChain) with
+On Zksync:
 
 ```sh
-yarn typechain
+yarn build:zksync
 ```
-
-During development of your smart contracts, changes can result in altered typechain bindings.
-You can remove the outdated build- and typechain-related files with
-
-```sh
-yarn clean
-```
-
-which will execute `yarn typechain` again. For convenience, use `yarn clean && yarn build`.
 
 ### Testing
 
-To test your contracts, run
+To test your contracts on EVM based networks, run
 
 ```sh
 yarn test
+```
+
+On Zksync:
+
+```sh
+yarn test:zksync
 ```
 
 ### Linting
@@ -213,6 +222,29 @@ This will upgrade your plugin repo to the latest Aragon OSx protocol version imp
 **For this to work, make sure that you are using the latest version of [this repository](https://github.com/aragon/osx-plugin-template-hardhat) in your fork.**
 
 Note, that if the deploying account doesn't own the repo anymore, this will create a `upgradeRepoProposalData-sepolia.json` containing the data for a management DAO signer to create a proposal upgrading the repo.
+
+If you want to run deployments against zksync, you can use:
+
+```sh
+yarn deploy:zksync --network zksyncSepolia --tags ...
+yarn deploy:zksync --network zksyncMainnet --tags ...
+```
+
+### Linting
+
+Lint the TypeScript code with
+
+```sh
+yarn lint
+```
+
+### Coverage
+
+Generate the code coverage with
+
+```sh
+yarn coverage
+```
 
 ## License
 

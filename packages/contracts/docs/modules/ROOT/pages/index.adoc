@@ -1,0 +1,43 @@
+= Admin
+
+== Description
+
+**Admin** is a governance plugin developed and maintained by the Aragon core team. Unlike most governance plugins that store and manage proposals, **Admin** operates as a direct execution tool. While it supports the **IProposal** standard of Aragon OSx, it bypasses proposal storage entirely. Instead, users can create and immediately execute proposals in a single transaction.
+
+This plugin is particularly useful in scenarios where the structure and process of proposals is required, but without the overhead of managing proposal data. The DAO grants `EXECUTE_PERMISSION` to the **Admin** plugin, allowing it to delegate this power via granting `EXECUTE_PROPOSAL_PERMISSION` to specific users or addresses. This means users of the plugin are indirectly granted execution rights within the DAO.
+
+== Core Functionalities
+
+- Users of the plugin can create and execute proposals in a single transaction using the `createProposal` or `executeProposal` function.
+- Metadata and actions are passed during execution, allowing the plugin to adhere to the concept of proposals while focusing on direct execution.
+- The plugin emits a `ProposalCreated` event followed immediately by a `ProposalExecuted` event.
+
+== Plugin Setup
+
+- **Contracts**: The **AdminSetup** contract contains the **Admin** plugin's implementation and deploys new instances of the plugin using the minimal proxy.
+- **Permissions**: The **AdminSetup** establishes the following default permissions to ensure smooth operation and integration with the associated DAO:
+
+[cols="2,2,2,2,3", options="header"]
+|===
+| Permission ID | Where (Granted By) | Who (Granted To) | Condition | Functions
+
+| `EXECUTE_PROPOSAL_PERMISSION_ID`
+| Admin Plugin
+| Admin Address
+| None
+| `createProposal`, `executeProposal`
+
+| `EXECUTE_PERMISSION_ID`
+| DAO
+| Admin Plugin
+| None
+| `execute`
+
+| `SET_TARGET_CONFIG_PERMISSION_ID`
+| Plugin
+| DAO
+| None
+| `setTargetConfig`
+|===
+
+This setup ensures that the **Admin** plugin is ready for operation immediately after installation, with all required contracts deployed and permissions configured.

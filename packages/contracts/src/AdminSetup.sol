@@ -26,6 +26,10 @@ contract AdminSetup is PluginSetup {
     bytes32 public constant EXECUTE_PROPOSAL_PERMISSION_ID =
         keccak256("EXECUTE_PROPOSAL_PERMISSION");
 
+    /// @notice The ID of the permission required to call the `setTargetConfig` function.
+    bytes32 private constant SET_TARGET_CONFIG_PERMISSION_ID =
+        keccak256("SET_TARGET_CONFIG_PERMISSION");
+
     /// @notice Thrown if the admin address is zero.
     /// @param admin The admin address.
     error AdminAddressInvalid(address admin);
@@ -54,7 +58,7 @@ contract AdminSetup is PluginSetup {
 
         // Prepare permissions
         PermissionLib.MultiTargetPermission[]
-            memory permissions = new PermissionLib.MultiTargetPermission[](2);
+            memory permissions = new PermissionLib.MultiTargetPermission[](3);
 
         // Grant `ADMIN_EXECUTE_PERMISSION` of the plugin to the admin.
         permissions[0] = PermissionLib.MultiTargetPermission({
@@ -65,8 +69,16 @@ contract AdminSetup is PluginSetup {
             permissionId: EXECUTE_PROPOSAL_PERMISSION_ID
         });
 
-        // Grant `EXECUTE_PERMISSION` on the DAO to the plugin.
         permissions[1] = PermissionLib.MultiTargetPermission({
+            operation: PermissionLib.Operation.Grant,
+            where: plugin,
+            who: _dao,
+            condition: PermissionLib.NO_CONDITION,
+            permissionId: SET_TARGET_CONFIG_PERMISSION_ID
+        });
+
+        // Grant `EXECUTE_PERMISSION` on the DAO to the plugin.
+        permissions[2] = PermissionLib.MultiTargetPermission({
             operation: PermissionLib.Operation.Grant,
             where: _dao,
             who: plugin,
@@ -85,7 +97,7 @@ contract AdminSetup is PluginSetup {
         SetupPayload calldata _payload
     ) external pure returns (PermissionLib.MultiTargetPermission[] memory permissions) {
         // Prepare permissions
-        permissions = new PermissionLib.MultiTargetPermission[](1);
+        permissions = new PermissionLib.MultiTargetPermission[](2);
 
         permissions[0] = PermissionLib.MultiTargetPermission({
             operation: PermissionLib.Operation.Revoke,
@@ -93,6 +105,14 @@ contract AdminSetup is PluginSetup {
             who: _payload.plugin,
             condition: PermissionLib.NO_CONDITION,
             permissionId: EXECUTE_PERMISSION_ID
+        });
+
+        permissions[1] = PermissionLib.MultiTargetPermission({
+            operation: PermissionLib.Operation.Revoke,
+            where: _payload.plugin,
+            who: _dao,
+            condition: PermissionLib.NO_CONDITION,
+            permissionId: SET_TARGET_CONFIG_PERMISSION_ID
         });
     }
 }

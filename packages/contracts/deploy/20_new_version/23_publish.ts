@@ -5,19 +5,42 @@ import {
   PLUGIN_SETUP_CONTRACT_NAME,
   VERSION,
 } from '../../plugin-settings';
+import {PluginRepo} from '../../typechain';
 import {
   findPluginRepo,
   getPastVersionCreatedEvents,
-  impersonatedManagementDaoSigner,
   isLocal,
   pluginEnsDomain,
+  impersonatedManagementDaoSigner,
+  isValidAddress,
 } from '../../utils/helpers';
-import {PLUGIN_REPO_PERMISSIONS, uploadToIPFS} from '@aragon/osx-commons-sdk';
+import {PLUGIN_REPO_PERMISSIONS, uploadToPinata} from '@aragon/osx-commons-sdk';
+import {PluginRepo__factory} from '@aragon/osx-ethers';
+import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {writeFile} from 'fs/promises';
 import {ethers} from 'hardhat';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import path from 'path';
+
+async function createVersion(
+  pluginRepo: PluginRepo,
+  release: number,
+  setup: string,
+  releaseMetadataURI: string,
+  buildMetadataURI: string,
+  signer: SignerWithAddress
+) {
+  const tx = await pluginRepo
+    .connect(signer)
+    .createVersion(
+      release,
+      setup,
+      ethers.utils.hexlify(ethers.utils.toUtf8Bytes(buildMetadataURI)),
+      ethers.utils.hexlify(ethers.utils.toUtf8Bytes(releaseMetadataURI))
+    );
+  await tx.wait();
+}
 
 /**
  * Publishes the plugin setup in the plugin repo as a new version as specified in the `./plugin-settings.ts` file.
@@ -31,14 +54,26 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments} = hre;
   const [deployer] = await hre.ethers.getSigners();
 
-  // Upload the metadata to IPFS
-  const releaseMetadataURI = `ipfs://${await uploadToIPFS(
-    JSON.stringify(METADATA.release, null, 2)
-  )}`;
-  const buildMetadataURI = `ipfs://${await uploadToIPFS(
-    JSON.stringify(METADATA.build, null, 2)
-  )}`;
+  let releaseMetadataURI = '0x';
+  let buildMetadataURI = '0x';
 
+  if (!isLocal(hre)) {
+    if (!process.env.PUB_PINATA_JWT) {
+      throw Error('PUB_PINATA_JWT is not set');
+    }
+
+    // Upload the metadata to IPFS
+    releaseMetadataURI = await uploadToPinata(
+      METADATA.release,
+      `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}-release-metadata`,
+      process.env.PUB_PINATA_JWT
+    );
+    buildMetadataURI = await uploadToPinata(
+      METADATA.build,
+      `${PLUGIN_REPO_ENS_SUBDOMAIN_NAME}-build-metadata`,
+      process.env.PUB_PINATA_JWT
+    );
+  }
   console.log(`Uploaded release metadata: ${releaseMetadataURI}`);
   console.log(`Uploaded build metadata: ${buildMetadataURI}`);
 
@@ -64,18 +99,25 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // Check build number
   const latestBuild = (await pluginRepo.buildCount(VERSION.release)).toNumber();
-  if (VERSION.build < latestBuild) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. The latest build is ${latestBuild}. Aborting publication...`
-    );
-  }
-  if (VERSION.build > latestBuild + 1) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. 
-        The latest build is ${latestBuild} and the next release you can publish is release number ${
-        latestBuild + 1
-      }. Aborting publication...`
-    );
+
+  if (latestBuild == 0 && VERSION.build > 1) {
+    // it means there's no build yet on the repo on the specific VERSION.release
+    // and build version in the plugin settings is > 1, meaning that
+    // it must push placeholder contracts and as the last one, push the actual plugin setup.
+  } else {
+    if (VERSION.build < latestBuild) {
+      throw Error(
+        `Publishing with build number ${VERSION.build} is not possible. The latest build is ${latestBuild}. Aborting publication...`
+      );
+    }
+    if (VERSION.build > latestBuild + 1) {
+      throw Error(
+        `Publishing with build number ${VERSION.build} is not possible. 
+          The latest build is ${latestBuild} and the next release you can publish is release number ${
+          latestBuild + 1
+        }. Aborting publication...`
+      );
+    }
   }
 
   if (setup == undefined || setup?.receipt == undefined) {
@@ -105,17 +147,39 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       []
     )
   ) {
-    // Create the new version
-    const tx = await pluginRepo
-      .connect(signer)
-      .createVersion(
-        VERSION.release,
-        setup.address,
-        ethers.utils.hexlify(ethers.utils.toUtf8Bytes(buildMetadataURI)),
-        ethers.utils.hexlify(ethers.utils.toUtf8Bytes(releaseMetadataURI))
-      );
+    if (latestBuild == 0 && VERSION.build > 1) {
+      // We are publishing the first version as build > 1.
+      // So we need to publish placeholders first..
+      const placeholderSetup = process.env.PLACEHOLDER_SETUP;
 
-    await tx.wait();
+      if (!placeholderSetup || !isValidAddress(placeholderSetup)) {
+        throw new Error(
+          'Aborting. Placeholder setup not defined in .env or is not a valid address (is not an address or is address zero)'
+        );
+      }
+
+      for (let i = 0; i < VERSION.build - 1; i++) {
+        console.log('Publishing placeholder', i + 1);
+        await createVersion(
+          pluginRepo,
+          VERSION.release,
+          placeholderSetup,
+          `{}`,
+          'placeholder-setup-build',
+          signer
+        );
+      }
+    }
+
+    // create the new version
+    await createVersion(
+      pluginRepo,
+      VERSION.release,
+      setup.address,
+      releaseMetadataURI,
+      buildMetadataURI,
+      signer
+    );
 
     const version = await pluginRepo['getLatestVersion(uint8)'](
       VERSION.release
@@ -130,6 +194,26 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   } else {
     // The deployer does not have `MAINTAINER_PERMISSION_ID` permission and we are not deploying to a production network,
     // so we write the data into a file for a management DAO member to create a proposal from it.
+
+    const pluginRepoInterface = PluginRepo__factory.createInterface();
+    const versionData = {
+      _release: VERSION.release,
+      _pluginSetup: setup.address,
+      _buildMetadata: ethers.utils.hexlify(
+        ethers.utils.toUtf8Bytes(buildMetadataURI)
+      ),
+      _releaseMetadata: ethers.utils.hexlify(
+        ethers.utils.toUtf8Bytes(releaseMetadataURI)
+      ),
+    };
+
+    const calldata = pluginRepoInterface.encodeFunctionData('createVersion', [
+      versionData._release,
+      versionData._pluginSetup,
+      versionData._buildMetadata,
+      versionData._releaseMetadata,
+    ]);
+
     const data = {
       proposalTitle: `Publish '${PLUGIN_CONTRACT_NAME}' plugin v${VERSION.release}.${VERSION.build}`,
       proposalSummary: `Publishes v${VERSION.release}.${VERSION.build} of the '${PLUGIN_CONTRACT_NAME}' plugin in the '${ensDomain}' plugin repo.`,
@@ -139,16 +223,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       actions: [
         {
           to: pluginRepo.address,
-          createVersion: {
-            _release: VERSION.release,
-            _pluginSetup: setup.address,
-            _buildMetadata: ethers.utils.hexlify(
-              ethers.utils.toUtf8Bytes(buildMetadataURI)
-            ),
-            _releaseMetadata: ethers.utils.hexlify(
-              ethers.utils.toUtf8Bytes(releaseMetadataURI)
-            ),
-          },
+          value: 0,
+          data: calldata,
+          createVersion: versionData,
         },
       ],
     };
@@ -177,20 +254,24 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
     throw `PluginRepo '${pluginEnsDomain(hre)}' does not exist yet.`;
   }
 
-  const pastVersions = await getPastVersionCreatedEvents(pluginRepo);
+  try {
+    const pastVersions = await getPastVersionCreatedEvents(pluginRepo);
 
-  // Check if the version was published already
-  const filteredLogs = pastVersions.filter(
-    items =>
-      items.event.args.release === VERSION.release &&
-      items.event.args.build === VERSION.build
-  );
-
-  if (filteredLogs.length !== 0) {
-    console.log(
-      `Build number ${VERSION.build} has already been published for release ${VERSION.release}. Skipping publication...`
+    // Check if the version was published already
+    const filteredLogs = pastVersions.filter(
+      items =>
+        items.event.args.release === VERSION.release &&
+        items.event.args.build === VERSION.build
     );
-    return true;
+
+    if (filteredLogs.length !== 0) {
+      console.log(
+        `Build number ${VERSION.build} has already been published for release ${VERSION.release}. Skipping publication...`
+      );
+      return true;
+    }
+  } catch (error) {
+    console.log(`Error in getting the previous version ${error}.`);
   }
 
   return false;
