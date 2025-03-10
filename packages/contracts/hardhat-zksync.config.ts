@@ -59,7 +59,7 @@ task('compile').setAction(async (args, hre, runSuper) => {
 task('deploy-contracts')
   .addOptionalParam('tags', 'Specify which tags to deploy')
   .setAction(async (args, hre) => {
-    await hre.run('build-contracts');
+    await hre.run('compile');
     await hre.run('deploy', {
       tags: args.tags,
     });
