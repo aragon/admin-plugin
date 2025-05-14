@@ -44,7 +44,7 @@ The `build` script will:
 Clone [OSx Commons](https://github.com/aragon/osx-commons) in a folder next to this repo.
 
 ```sh
-yarn sync-addresses
+yarn sync-from-commons
 ```
 
 ### Publishing
