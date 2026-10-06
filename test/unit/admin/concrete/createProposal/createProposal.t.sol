@@ -56,6 +56,8 @@ abstract contract CreateProposalTest is BaseTest {
 
     function test_WhenTheDataHasTrailingBytes() external {
         // it should ignore them (abi.decode does not check the length).
+        // Any 32 bytes will do as trailing data.
+        // forge-lint: disable-next-line(unsafe-typecast)
         _create(admin, _withFailingFirst(), 0, 0, abi.encodePacked(abi.encode(uint256(1)), bytes32("trailing")));
         assertEq(actionTarget.value(), 1, "decoded the first word");
     }

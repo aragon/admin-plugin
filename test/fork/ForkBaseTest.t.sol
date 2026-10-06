@@ -92,6 +92,8 @@ contract ForkBaseTest is Constants, Test {
         try IPluginSetup(setup).prepareInstallation(address(0xdead), _installData()) {
             return false;
         } catch (bytes memory reason) {
+            // Only the selector matters: the truncation is intended.
+            // forge-lint: disable-next-line(unsafe-typecast)
             return reason.length >= 4 && bytes4(reason) == PLACEHOLDER_SETUP_CANNOT_BE_USED;
         }
     }
