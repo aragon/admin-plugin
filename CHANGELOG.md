@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to the [Aragon OSx Plugin Versioning Convention](https://devs.aragon.org/docs/osx/how-to-guides/plugin-development/publication/versioning).
 
+## Unreleased
+
+### Changed
+
+- Migrated the project from Hardhat to Foundry: sources in `src/` and `src/zkSync/` (unchanged), tests rewritten in Solidity, deployment scripts in `script/` driven by `just` and `just-foundry`.
+- OSx and osx-commons come from the `lib/osx` submodule.
+
+### Fixed
+
+- `build-metadata.json`: the `change` text was a placeholder, the admin input described the wrong permission, and the target config had wrong internal types. An explicit empty `prepareUpdate` was added (installations cannot be updated).
+
+### Removed
+
+- The `@aragon/admin-plugin-artifacts` npm package. ABIs and addresses are published in artifacts-hub.
+
 ## v1.2
 
 ### Added
