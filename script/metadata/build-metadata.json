@@ -1,6 +1,6 @@
 {
   "ui": {},
-  "change": "v1.2\n [PLACEHOLDER for describing the changes in the upcoming build.]",
+  "change": "v1.2\n - Implements the standard `IProposal` interface (`createProposal`, `hasSucceeded`, `canExecute`, `customProposalParamsABI`; `execute` is not supported: proposals execute when created).\n - `initialize` receives a `TargetConfig`, so actions can be forwarded to a target other than the DAO.\n - The admin is advertised as the DAO member through `IMembership`.\n",
   "pluginSetup": {
     "prepareInstallation": {
       "description": "The information required for the installation.",
@@ -9,7 +9,7 @@
           "name": "admin",
           "type": "address",
           "internalType": "address",
-          "description": "The address of the admin account receiving the `EXECUTE_PERMISSION_ID` permission."
+          "description": "The account receiving `EXECUTE_PROPOSAL_PERMISSION` on the plugin, so that it can execute actions on the DAO through it."
         },
         {
           "components": [
@@ -17,22 +17,23 @@
               "name": "target",
               "type": "address",
               "internalType": "address",
-              "description": "The target contract to which actions will be forwarded to for execution."
+              "description": "The target contract to which actions will be forwarded to for execution. Use the zero address to target the DAO."
             },
             {
               "name": "operation",
               "type": "uint8",
-              "internalType": "uint8",
-              "description": "The operation type(either `call` or `delegatecall`) that will be used for execution forwarding."
+              "internalType": "enum IPlugin.Operation",
+              "description": "The operation type (0 = call, 1 = delegatecall) used to forward actions to the target."
             }
           ],
-          "name": "TargetConfig",
+          "name": "targetConfig",
           "type": "tuple",
-          "internalType": "struct TokenVoting.TargetConfig",
-          "description": "The initial target config"
+          "internalType": "struct IPlugin.TargetConfig",
+          "description": "The initial execution target configuration."
         }
       ]
     },
+    "prepareUpdate": {},
     "prepareUninstallation": {
       "description": "No input is required for the uninstallation.",
       "inputs": []
