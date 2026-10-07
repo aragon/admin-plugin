@@ -21,11 +21,11 @@ abstract contract Constants {
     bytes4 internal constant TARGET_CONFIG_ID = bytes4(keccak256("setTargetConfig((address,uint8))"))
         ^ bytes4(keccak256("getTargetConfig()")) ^ bytes4(keccak256("getCurrentTargetConfig()"));
     bytes4 internal constant IMEMBERSHIP_ID = bytes4(keccak256("isMember(address)"));
-    bytes4 internal constant IPROPOSAL_ID = bytes4(
-        keccak256("createProposal(bytes,(address,uint256,bytes)[],uint64,uint64,bytes)")
-    ) ^ bytes4(keccak256("hasSucceeded(uint256)")) ^ bytes4(keccak256("execute(uint256)"))
-    ^ bytes4(keccak256("canExecute(uint256)")) ^ bytes4(keccak256("customProposalParamsABI()"))
-    ^ bytes4(keccak256("proposalCount()"));
+    bytes4 internal constant IPROPOSAL_CREATE_SELECTOR =
+        bytes4(keccak256("createProposal(bytes,(address,uint256,bytes)[],uint64,uint64,bytes)"));
+    bytes4 internal constant IPROPOSAL_ID = IPROPOSAL_CREATE_SELECTOR ^ bytes4(keccak256("hasSucceeded(uint256)"))
+        ^ bytes4(keccak256("execute(uint256)")) ^ bytes4(keccak256("canExecute(uint256)"))
+        ^ bytes4(keccak256("customProposalParamsABI()")) ^ bytes4(keccak256("proposalCount()"));
     /// @dev OSx v1.0 IProposal (only `proposalCount()`), still advertised by the proposal base for compatibility.
     bytes4 internal constant IPROPOSAL_LEGACY_ID = bytes4(keccak256("proposalCount()"));
     bytes4 internal constant ADMIN_ID = bytes4(keccak256("executeProposal(bytes,(address,uint256,bytes)[],uint256)"));

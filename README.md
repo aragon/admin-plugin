@@ -19,8 +19,6 @@ Documentation: [protocol-doc, Admin Plugin](https://github.com/aragon/protocol-d
 - Started: 2024-11-18
 - Finished: 2025-02-13
 
-`src/Admin.sol` and `src/AdminSetup.sol` are identical to the audited commit. The zkSync variants (`src/zkSync/`) were added after the audit.
-
 ## Contracts
 
 | Contract | Purpose |

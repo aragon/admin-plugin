@@ -27,7 +27,10 @@ contract Deploy is BaseScript {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        adminRepo = PluginRepoFactory(pluginRepoFactory).createPluginRepo(_ensSubdomain(), deployer);
+        string memory subdomain = _ensSubdomain();
+
+        adminRepo = PluginRepoFactory(pluginRepoFactory).createPluginRepo(subdomain, deployer);
+        repoEnsName = _ensName(subdomain);
         adminSetup = _newSetup();
         _publish(
             adminRepo, address(adminSetup), bytes(PluginSettings.BUILD_METADATA), bytes(PluginSettings.RELEASE_METADATA)

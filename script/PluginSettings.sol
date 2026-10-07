@@ -13,12 +13,12 @@ library PluginSettings {
     uint8 internal constant VERSION_BUILD = 2;
 
     /// @dev Source: `script/metadata/build-metadata.json`.
-    string internal constant BUILD_METADATA = "ipfs://QmRVs5yJzJ7rFPGRvVnzvimj63N7pWPzd169rud698AwsZ";
+    string internal constant BUILD_METADATA = "ipfs://QmfWLgS9tQSSd7bKZ7RT1yURFrRwZgkwpzVJVRH1deTTYe";
     /// @dev Source: `script/metadata/release-metadata.json`.
-    string internal constant RELEASE_METADATA = "ipfs://QmRfQ7ghLZFy5DHQ63eDK3iPfXUP6igoupFYsy9whhYyJq";
+    string internal constant RELEASE_METADATA = "ipfs://QmYBiJKv2y6kGjwd11D9fRnHT3aXRD6HXG91QQLZzieRK6";
     /// @dev Title, summary and description of the management DAO proposal that publishes the build.
     ///      Source: `script/metadata/new-version-proposal-metadata.json`.
-    string internal constant PROPOSAL_METADATA = "ipfs://Qma3BneRJoRdHW3ptH19w3jLbENvFBDoSgW4qDCmFkjYt5";
+    string internal constant PROPOSAL_METADATA = "ipfs://QmPXd2ksiqR3wX3A4LV4xPfhAE4m1a6tCZqAxMQEcq4iGV";
 
     /// @dev Metadata of the placeholder builds that keep build numbers aligned across networks.
     ///      Same CID as the staged-proposal-processor-plugin uses for

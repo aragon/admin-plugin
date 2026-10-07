@@ -15,13 +15,16 @@ contract BaseScript is Script {
     error InvalidVersionBuild(uint8 build, uint256 latestBuild);
     error MetadataNotPinned(string name);
 
-    /// @dev Slug and canonical ENS name that artifacts-hub reserves for this plugin.
+    /// @dev Slug that artifacts-hub reserves for this plugin.
     ///      Must match the entry in aragon/artifacts-hub `scripts/lib/plugin-catalog.ts`.
     string internal constant PLUGIN_SLUG = "admin";
-    string internal constant PLUGIN_ENS = "admin.plugin.dao.eth";
+    /// @dev Parent domain of the plugin repo ENS names (`<subdomain>.plugin.dao.eth`).
+    string internal constant PLUGIN_ENS_PARENT = ".plugin.dao.eth";
 
     PluginSetup public adminSetup;
     PluginRepo public adminRepo;
+    /// @dev ENS name of the repo, set by `Deploy` when it registers a subdomain; omitted from the artifact when empty.
+    string public repoEnsName;
 
     uint256 internal deployerPrivateKey = vm.envUint("DEPLOYER_KEY");
     address internal deployer = vm.addr(deployerPrivateKey);
@@ -39,6 +42,11 @@ contract BaseScript is Script {
     function _newSetup() internal returns (PluginSetup) {
         if (block.chainid == 324 || block.chainid == 300) return new AdminSetupZkSync();
         return new AdminSetup();
+    }
+
+    /// @dev The ENS name registered for `_subdomain`, or nothing when no subdomain was registered.
+    function _ensName(string memory _subdomain) internal pure returns (string memory) {
+        return bytes(_subdomain).length == 0 ? "" : string.concat(_subdomain, PLUGIN_ENS_PARENT);
     }
 
     function _versionString(uint8 _release, uint8 _build) internal pure returns (string memory) {
@@ -84,9 +92,10 @@ contract BaseScript is Script {
             PLUGIN_SLUG,
             "\",\n  \"plugin\": {\n    \"repo\": \"",
             vm.toString(address(adminRepo)),
-            "\",\n    \"ens\": \"",
-            PLUGIN_ENS,
-            "\",\n    \"maintainer\": \"",
+            "\",\n",
+            // `ens` is optional in the schema: omitted when the repo has no ENS name.
+            bytes(repoEnsName).length == 0 ? "" : string.concat("    \"ens\": \"", repoEnsName, "\",\n"),
+            "    \"maintainer\": \"",
             vm.toString(_maintainer),
             "\",\n    \"versions\": [\n",
             versions,
