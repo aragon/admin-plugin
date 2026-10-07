@@ -1,31 +1,25 @@
-# directories
-.coverage_artifacts
-.coverage_cache
-.coverage_contracts
-packages/contracts/artifacts
-build
-cache
-coverage
-dist
-node_modules
-typechain
+# Compiler files
+cache/
+out/
+zkout/
 
-# files
-*.env
-*.log
+# Development broadcast logs
+/broadcast
+
+# Deployment outputs (imported into artifacts-hub)
+artifacts/
+logs/
+
+# Dotenv files
+.env
+.env.*
+!.env.example
+
+# Coverage
+report/
+lcov.info
+
+# Temporary test trees
+*.tree
+
 .DS_Store
-.pnp.*
-coverage.json
-
-packages/contracts/createVersionProposalData*.json
-packages/contracts/upgradeRepoProposalData*.json
-
-artifacts-zk
-cache-zk
-deployments-zk
-deployments
-
-generated
-
-#artifacts
-packages/artifacts/src/abi.ts

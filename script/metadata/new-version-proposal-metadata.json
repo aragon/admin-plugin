@@ -1,0 +1,15 @@
+{
+  "title": "Publish Admin v1.2",
+  "summary": "Publishes build 2 of the Admin plugin (release 1) on the admin.plugin.dao.eth plugin repository.",
+  "description": "# Publish a new plugin version\n\nCalls `createVersion` on the Admin plugin repository (`admin.plugin.dao.eth`) to publish **v1.2** (release 1, build 2). If the repository is missing earlier builds on this network, the same plugin setup is published once per missing build, so that build numbers match every other network.\n\n# What changes in v1.2\n\n- The plugin implements the standard `IProposal` interface (`createProposal`, `hasSucceeded`, `canExecute`, `customProposalParamsABI`). Proposals still execute when they are created.\n- Actions can be forwarded to a target other than the DAO (`TargetConfig`), set at installation and changeable by the DAO.\n\n# Existing installations\n\nThe Admin plugin is a minimal clone and cannot be updated in place. DAOs that want this version uninstall the previous one and install this one.\n\nOn zkSync Era, the setup deploys a constructor-initialized variant (`AdminSetupZkSync`), because minimal clones are not supported there.",
+  "resources": [
+    {
+      "name": "Changelog",
+      "url": "https://github.com/aragon/admin-plugin/blob/main/CHANGELOG.md"
+    },
+    {
+      "name": "Audit report",
+      "url": "https://github.com/aragon/osx/tree/main/audits"
+    }
+  ]
+}
