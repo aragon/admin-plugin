@@ -90,7 +90,7 @@ abstract contract ExecuteProposalTest is BaseTest {
 
     function test_WhenTheAdminExecutes_ItShouldEmitInOrder() external {
         // it should emit DAO Executed (callId = proposal ID), then ProposalCreated, then ProposalExecuted.
-        // FINDING: A4. ProposalCreated comes after the execution.
+        // ProposalCreated comes after the execution.
         Action[] memory actionList = _actions(2);
         uint256 id = _expectedProposalId(actionList, PROPOSAL_METADATA);
 
@@ -125,7 +125,7 @@ abstract contract ExecuteProposalTest is BaseTest {
 
     function test_WhenTheSameProposalIsExecutedTwiceInOneBlock() external {
         // it should execute both and give them the same ID and DAO call ID.
-        // FINDING: A1. Admin stores no proposals, so the ID collision is not detected.
+        // Admin stores no proposals, so the ID collision is not detected.
         Action[] memory actionList = _actions(1);
         vm.recordLogs();
         uint256 first = _execute(admin, actionList, 0);

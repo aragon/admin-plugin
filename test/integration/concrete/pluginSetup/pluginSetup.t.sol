@@ -168,8 +168,8 @@ abstract contract PluginSetup_IntegrationTest is BaseTest {
     }
 
     function test_RevertWhen_ApplyingAUiOnlyUpdate() external {
-        // it should prepare the UI-only update (same setup) but revert when applying it (finding A9).
-        // FINDING: A9. `PluginSetupProcessor.applyUpdate` calls `implementation()` on the plugin, which clone-based
+        // it should prepare the UI-only update (same setup) but revert when applying it.
+        // `PluginSetupProcessor.applyUpdate` calls `implementation()` on the plugin, which clone-based
         // and constructed plugins do not have, so even an update between two builds of the same setup cannot be
         // applied. Installations stay on the build they were installed with.
         Admin installed = _install();
@@ -198,8 +198,8 @@ abstract contract PluginSetup_IntegrationTest is BaseTest {
     }
 
     function test_RevertWhen_UpdatingToADifferentSetup() external {
-        // it should revert: a clone (or constructed) plugin cannot be upgraded (finding A7).
-        // FINDING: A7. Installations cannot move to a build with a different setup; DAOs must uninstall and reinstall.
+        // it should revert: a clone (or constructed) plugin cannot be upgraded.
+        // Installations cannot move to a build with a different setup; DAOs must uninstall and reinstall.
         Admin installed = _install();
         vm.roll(block.number + 1);
         vm.expectRevert(abi.encodeWithSelector(PluginSetupProcessor.PluginNonupgradeable.selector, address(installed)));
@@ -218,7 +218,7 @@ abstract contract PluginSetup_IntegrationTest is BaseTest {
         address p = address(installed);
         assertFalse(dao.hasPermission(address(dao), p, EXECUTE_PERMISSION_ID, ""), "execute on DAO revoked");
         assertFalse(dao.hasPermission(p, address(dao), SET_TARGET_CONFIG_PERMISSION_ID, ""), "target config revoked");
-        // FINDING: A5. Uninstallation leaves EXECUTE_PROPOSAL_PERMISSION with the admin (documented in the setup).
+        // Uninstallation leaves EXECUTE_PROPOSAL_PERMISSION with the admin (documented in the setup).
         assertTrue(dao.hasPermission(p, admin, EXECUTE_PROPOSAL_PERMISSION_ID, ""), "admin keeps it");
         assertTrue(installed.isMember(admin), "still reported as member");
         assertFalse(dao.hasPermission(address(dao), address(psp), ROOT_PERMISSION_ID, ""), "PSP has no ROOT");

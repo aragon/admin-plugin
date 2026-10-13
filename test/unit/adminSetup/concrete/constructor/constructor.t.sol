@@ -54,7 +54,7 @@ contract Constructor_AdminSetupZkSync_UnitTest is ConstructorTest {
 
     function test_WhenDeployed() external view {
         // it should have no implementation: each installation deploys a full AdminZkSync.
-        // FINDING: A8. implementation() is address(0), the same value as an OSx PlaceholderSetup.
+        // implementation() is address(0), the same value as an OSx PlaceholderSetup.
         assertEq(setup.implementation(), address(0));
     }
 }

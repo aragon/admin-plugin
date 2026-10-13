@@ -80,7 +80,7 @@ abstract contract Admin_FuzzTest is BaseTest {
 
     function testFuzz_SameContentInTheSameBlockCollides(bytes memory _metadata, uint8 _count) external {
         // it should return the same id twice in one block and a different one in the next block.
-        // FINDING: A1. Admin stores no proposals, so identical executions in one block share the proposal id
+        // Admin stores no proposals, so identical executions in one block share the proposal id
         // (and the DAO call id) without reverting.
         Action[] memory actionList = _actions(bound(_count, 0, 8));
         vm.startPrank(admin);
@@ -122,8 +122,8 @@ abstract contract Admin_FuzzTest is BaseTest {
     function testFuzz_WhenCreatingThroughIProposal(uint64 _startDate, uint64 _endDate, uint256 _allowFailureMap)
         external
     {
-        // it should execute immediately whatever the dates (finding A3), with the decoded failure map.
-        // FINDING: A3. `createProposal` ignores the start and end dates.
+        // it should execute immediately whatever the dates, with the decoded failure map.
+        // `createProposal` ignores the start and end dates.
         Action[] memory actionList = new Action[](2);
         actionList[0] = _failingAction();
         actionList[1] = _actions(1)[0];

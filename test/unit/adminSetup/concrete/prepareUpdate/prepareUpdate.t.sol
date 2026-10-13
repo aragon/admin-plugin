@@ -10,7 +10,7 @@ import {PluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/Plugin
 abstract contract PrepareUpdateTest is AdminSetupBaseTest {
     function testFuzz_RevertWhen_PreparingAnyUpdate(uint16 _fromBuild, bytes calldata _data) external {
         // it should revert with NonUpgradeablePlugin, whatever the source build and payload.
-        // FINDING: A7. Installations can never be updated in place.
+        // Installations can never be updated in place.
         IPluginSetup.SetupPayload memory payload =
             IPluginSetup.SetupPayload({plugin: address(plugin), currentHelpers: new address[](0), data: _data});
         vm.expectRevert(PluginSetup.NonUpgradeablePlugin.selector);

@@ -6,7 +6,7 @@ import {BaseTest} from "../../../../BaseTest.t.sol";
 abstract contract HasSucceededTest is BaseTest {
     function testFuzz_WhenQueriedForAnyId(uint256 _proposalId) external view {
         // it should be true, even for ids that never existed.
-        // FINDING: A2. Admin stores no proposals, so it cannot tell.
+        // Admin stores no proposals, so it cannot tell.
         assertTrue(plugin.hasSucceeded(_proposalId));
     }
 

@@ -52,14 +52,14 @@ contract Update_ForkTest is ForkBaseTest {
     }
 
     function test_RevertWhen_UpdatingFromBuild1() external {
-        // it should reject the update (finding A7); the plugin keeps working.
-        // FINDING: A7. Installations cannot move to a new build; DAOs must uninstall and reinstall.
+        // it should reject the update; the plugin keeps working.
+        // Installations cannot move to a new build; DAOs must uninstall and reinstall.
         _install(1);
         _assertUpdateRejectedAndStillWorking(1);
     }
 
     function test_RevertWhen_UpdatingFromBuild2() external {
-        // it should reject the update (finding A7); the plugin keeps working.
+        // it should reject the update; the plugin keeps working.
         _install(2);
         _assertUpdateRejectedAndStillWorking(2);
     }

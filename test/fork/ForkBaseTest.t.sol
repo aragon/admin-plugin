@@ -63,13 +63,13 @@ contract ForkBaseTest is Constants, Test {
 
     // ==== DAO creation through the live DAOFactory ====
 
-    function _createDao(PluginRepo.Tag memory _versionTag, bytes memory _installData)
+    function _createDao(PluginRepo.Tag memory _versionTag, bytes memory _data)
         internal
         returns (DAO dao, address plugin)
     {
         DAOFactory.PluginSettings[] memory plugins = new DAOFactory.PluginSettings[](1);
         plugins[0] = DAOFactory.PluginSettings({
-            pluginSetupRef: PluginSetupRef({versionTag: _versionTag, pluginSetupRepo: adminRepo}), data: _installData
+            pluginSetupRef: PluginSetupRef({versionTag: _versionTag, pluginSetupRepo: adminRepo}), data: _data
         });
         DAOFactory.InstalledPlugin[] memory installed;
         (dao, installed) = daoFactory.createDao(

@@ -72,7 +72,7 @@ abstract contract CreateProposalTest is BaseTest {
 
     function test_WhenDatesAreGiven() external {
         // it should ignore them and execute now, emitting the current time as start and end.
-        // FINDING: A3. A start date in the future, or an end date in the past, does not delay or prevent execution.
+        // A start date in the future, or an end date in the past, does not delay or prevent execution.
         Action[] memory actionList = _actions(1);
         uint256 id = _expectedProposalId(actionList, PROPOSAL_METADATA);
         vm.expectEmit(address(plugin));

@@ -33,7 +33,7 @@ abstract contract PrepareUninstallationTest is AdminSetupBaseTest {
 
     function test_WhenApplied() external {
         // it should leave the admin unable to act on the DAO, but still holding EXECUTE_PROPOSAL on the plugin.
-        // FINDING: A5. The admin's permission on the (now inert) plugin is not revoked.
+        // The admin's permission on the (now inert) plugin is not revoked.
         PermissionLib.MultiTargetPermission[] memory permissions =
             setup.prepareUninstallation(address(dao), _payload(address(plugin)));
         vm.prank(manager);

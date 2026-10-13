@@ -41,7 +41,7 @@ abstract contract IsMemberTest is BaseTest {
 
     function test_WhenThePermissionIsGrantedToAnyAddress() external {
         // it should make every address a member.
-        // FINDING: A6. isMember mirrors the permission, so an ANY_ADDR grant makes everyone a member.
+        // isMember mirrors the permission, so an ANY_ADDR grant makes everyone a member.
         _grant(address(plugin), ANY_ADDR, EXECUTE_PROPOSAL_PERMISSION_ID);
         assertTrue(plugin.isMember(stranger), "stranger");
         assertTrue(plugin.isMember(address(0xBEEF)), "anyone");
@@ -49,7 +49,7 @@ abstract contract IsMemberTest is BaseTest {
 
     function test_WhenTheGrantHasAConditionReadingTheCalldata() external {
         // it should evaluate the condition with empty calldata, which can disagree with what executeProposal allows.
-        // FINDING: A6. isMember passes "" as calldata while executeProposal passes its own calldata.
+        // isMember passes "" as calldata while executeProposal passes its own calldata.
         address nonEmptyOnly = makeAddr("nonEmptyOnly");
         address emptyOnly = makeAddr("emptyOnly");
         vm.startPrank(manager);
