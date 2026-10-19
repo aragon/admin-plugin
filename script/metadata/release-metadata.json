@@ -1,0 +1,5 @@
+{
+  "name": "Admin",
+  "description": "A governance plugin that gives a single account (the admin) the power to execute actions on the DAO directly, without voting.",
+  "images": {}
+}
